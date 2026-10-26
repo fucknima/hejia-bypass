@@ -32,6 +32,23 @@ jobs:
           echo "--- sdks ---"
           ls "$THEOS/sdks" | grep -i iphoneos | head
 
+      - name: Install ldid
+        run: |
+          set -euo pipefail
+          if ! command -v ldid >/dev/null 2>&1; then
+            brew install ldid || {
+              # brew 不可用时从源码编译
+              git clone --depth 1 https://github.com/ProcursusTeam/ldid.git /tmp/ldid
+              cd /tmp/ldid
+              git submodule update --init --depth 1
+              make CXXFLAGS="-std=c++20 -I. -I./sysdir" 
+              sudo mkdir -p /usr/local/bin
+              sudo cp ./ldid /usr/local/bin/ldid
+            }
+          fi
+          ldid -v || ldid 2>&1 | head -3
+          which ldid
+
       - name: Build
         run: |
           set -o pipefail
