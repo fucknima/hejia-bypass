@@ -21,11 +21,16 @@ jobs:
 
       - name: Install Theos
         run: |
+          set -e
           export THEOS=${{ github.workspace }}/theos
-          git clone --recursive --depth 1 https://github.com/theos/theos.git "$THEOS"
-          # SDK：theos/sdks 仓库提供打包好的 iPhoneOS SDK
+          # Theos 本体（不拉子模块，避免 sdks 目录冲突）
+          git clone --depth 1 https://github.com/theos/theos.git "$THEOS"
+          git -C "$THEOS" submodule update --init --depth 1 makefiles
+          # 官方 SDK 仓库
+          rm -rf "$THEOS/sdks"
           git clone --depth 1 https://github.com/theos/sdks.git "$THEOS/sdks"
-          ls "$THEOS/sdks" | head -20
+          # 选一个可用的 SDK
+          ls "$THEOS/sdks" | grep -i iphoneos | head -20
 
       - name: Build
         run: |
