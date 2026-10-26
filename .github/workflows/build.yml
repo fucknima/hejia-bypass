@@ -16,44 +16,57 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install Theos
         run: |
-          set -e
+          set -euo pipefail
           export THEOS=${{ github.workspace }}/theos
-          # Theos 本体（不拉子模块，避免 sdks 目录冲突）
           git clone --depth 1 https://github.com/theos/theos.git "$THEOS"
           git -C "$THEOS" submodule update --init --depth 1 makefiles
-          # 官方 SDK 仓库
           rm -rf "$THEOS/sdks"
           git clone --depth 1 https://github.com/theos/sdks.git "$THEOS/sdks"
-          # 下载 vendor 预编译库（libsubstrate / libhooker 等），缺少会报
-          # "The vendor/include and/or vendor/lib directories are missing"
-          "$THEOS/bin/update-theos" || bash "$THEOS/bin/update-theos.sh"
-          ls "$THEOS/vendor" 2>/dev/null && ls "$THEOS/vendor/lib" 2>/dev/null | head
-          # 选一个可用的 SDK（优先 16.5）
-          ls "$THEOS/sdks" | grep -i iphoneos | head -20
+          # vendor 预编译库（libsubstrate 等），缺失会导致 before-all 报错
+          "$THEOS/bin/update-theos"
+          echo "--- vendor ---"
+          ls "$THEOS/vendor/lib" | head
+          echo "--- sdks ---"
+          ls "$THEOS/sdks" | grep -i iphoneos | head
 
       - name: Build
         run: |
+          set -o pipefail
           export THEOS=${{ github.workspace }}/theos
           make clean || true
-          make -j"$(sysctl -n hw.ncpu)" DEBUG=0 FINALPACKAGE=1
+          make -j"$(sysctl -n hw.ncpu)" DEBUG=0 FINALPACKAGE=1 2>&1 | tee build.log
 
-      - name: Locate artifacts
+      - name: Show errors if failed
+        if: failure()
         run: |
-          find .theos -name '*.dylib' -o -name '*.deb' | head -20
+          echo "================ BUILD LOG (tail) ================"
+          tail -80 build.log || true
+          echo "================ error lines ================"
+          grep -nE "error:|Error |undefined|not found" build.log || true
+
+      - name: Collect artifacts
+        if: success()
+        run: |
+          echo "--- dylib ---"
+          find . -name "HeJiaBypass.dylib" -not -path "./theos/*" | tee dylibs.txt
+          cat dylibs.txt | while read -r f; do
+            echo "== $f"; file "$f"; lipo -info "$f" || true
+          done
 
       - name: Upload dylib
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: HeJiaBypass-dylib
-          path: .theos/obj/**/*.dylib
-          if-no-files-found: warn
+          path: |
+            **/HeJiaBypass.dylib
+          if-no-files-found: error
 
       - name: Upload deb
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: HeJiaBypass-deb

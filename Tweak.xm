@@ -20,17 +20,28 @@
 #import <objc/runtime.h>
 #import <sys/sysctl.h>
 #import <sys/types.h>
-#import <sys/proc.h>
 #import <unistd.h>
 #import <string.h>
+#import <stdlib.h>
 #import <dlfcn.h>
-// iOS SDK 不提供 <sys/ptrace.h>，直接内联声明（tweak 通用做法）
+
+#include <substrate.h>
+
+// --- iOS SDK 缺失的声明（tweak 通用补法）----------------------------------
+// 1) caddr_t：iOS SDK 不导出
+#ifndef _CADDR_T
+typedef char *caddr_t;
+#define _CADDR_T
+#endif
+// 2) ptrace：iOS SDK 无 <sys/ptrace.h>；Theos 以 ObjC++ 编译，需 extern "C"
 #ifndef PT_DENY_ATTACH
 #define PT_DENY_ATTACH 31
 #endif
+#ifdef __cplusplus
+extern "C" int ptrace(int request, pid_t pid, caddr_t addr, int data);
+#else
 extern int ptrace(int request, pid_t pid, caddr_t addr, int data);
-
-#include <substrate.h>
+#endif
 
 // ---------------------------------------------------------------------------
 // 日志
@@ -291,10 +302,18 @@ static BOOL HMFileExistsAtPath(id self, SEL _cmd, NSString *path, BOOL *isDirect
     return NO;
 }
 
-// sysctl：只清理 kinfo_proc 里的 P_TRACED 标记，其余查询原样放行
+// sysctl：清除 kinfo_proc 的 P_TRACED 标记
+// 注意：iOS SDK 已不导出 <sys/proc.h>，struct kinfo_proc 不可用，
+//       因此改为按原始内存偏移扫描（arm64 上 p_flag 位于结构体偏移 32）。
 static int (*original_sysctl)(int *, u_int, void *, size_t *, void *, size_t) = NULL;
 
-#define HM_P_TRACED 0x00000800
+#ifndef P_TRACED
+#define P_TRACED 0x00000800
+#endif
+
+// arm64 的 struct extern_proc 中 p_flag 的偏移
+#define HM_P_FLAG_OFFSET 32
+#define HM_KINFO_PROC_SIZE 0x88   // sizeof(struct kinfo_proc) on arm64
 
 static int HM_sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp,
                      void *newp, size_t newlen) {
@@ -305,9 +324,9 @@ static int HM_sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp,
     // 调试检测惯用写法：sysctl([CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()])
     if (ret == 0 && name && namelen >= 4 &&
         name[0] == CTL_KERN && name[1] == KERN_PROC && name[2] == KERN_PROC_PID &&
-        oldp && oldlenp && *oldlenp >= sizeof(struct kinfo_proc)) {
-        struct kinfo_proc *kp = (struct kinfo_proc *)oldp;
-        kp->kp_proc.p_flag &= ~HM_P_TRACED;
+        oldp && oldlenp && *oldlenp >= HM_KINFO_PROC_SIZE) {
+        int *flag = (int *)((unsigned char *)oldp + HM_P_FLAG_OFFSET);
+        *flag &= ~P_TRACED;
     }
     return ret;
 }
@@ -361,12 +380,16 @@ static void HMInstallCHooks(void) {
 // 5. 延迟钩子：兜住运行期 dlopen 的框架
 // ---------------------------------------------------------------------------
 static void HMScheduleLateHooks(void) {
-    const int64_t delays[] = { 1, 3, 6, 12 };
+    // 用全局队列而非主队列：避免 App 主线程启动期卡住时延迟任务不执行
+    static const int64_t delays[] = { 1, 3, 6, 12 };
+    dispatch_queue_t q = dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
+
     for (size_t i = 0; i < sizeof(delays) / sizeof(delays[0]); i++) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delays[i] * NSEC_PER_SEC),
-                       dispatch_get_main_queue(), ^{
-            HMHookBlackbees();
-            HMHookMainAppExtra();
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delays[i] * NSEC_PER_SEC), q, ^{
+            @autoreleasepool {
+                HMHookBlackbees();
+                HMHookMainAppExtra();
+            }
         });
     }
 }

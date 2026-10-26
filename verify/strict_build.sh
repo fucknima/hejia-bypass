@@ -3,7 +3,7 @@
 set -e
 D=$(cd "$(dirname "$0")" && pwd)
 OUT="${1:-/tmp/HeJiaBypass.o}"
-clang -c -x objective-c \
+clang -c -x objective-c++ \
   -target arm64-apple-ios14.0 \
   -fobjc-arc -fblocks -O2 \
   -I"$D/stubs" -I"$D/stubs/Foundation" -I"$D/stubs/CoreFoundation" \

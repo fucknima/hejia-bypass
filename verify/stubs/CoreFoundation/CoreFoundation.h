@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stddef.h>
 typedef const void *CFTypeRef;
 typedef const struct __CFDictionary *CFDictionaryRef;
@@ -13,3 +16,6 @@ extern const CFDictionaryKeyCallBacks kCFTypeDictionaryKeyCallBacks;
 extern const CFDictionaryValueCallBacks kCFTypeDictionaryValueCallBacks;
 CFDictionaryRef CFDictionaryCreate(CFAllocatorRef allocator, const void **keys, const void **values, CFIndex numValues, const CFDictionaryKeyCallBacks *keyCallBacks, const CFDictionaryValueCallBacks *valueCallBacks);
 void CFRelease(CFTypeRef cf);
+#ifdef __cplusplus
+}
+#endif

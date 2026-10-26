@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -18,9 +21,16 @@ typedef long dispatch_once_t;
 #define NSEC_PER_SEC 1000000000ull
 #define DISPATCH_TIME_NOW 0ull
 typedef void (^dispatch_block_t)(void);
+typedef void *dispatch_queue_t;
+void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 dispatch_time_t dispatch_time(dispatch_time_t when, int64_t delta);
 void dispatch_after(dispatch_time_t when, void *queue, dispatch_block_t block);
 void *dispatch_get_main_queue(void);
+void *dispatch_get_global_queue(long identifier, unsigned long flags);
+typedef unsigned int qos_class_t;
+#ifndef QOS_CLASS_UTILITY
+#define QOS_CLASS_UTILITY ((qos_class_t)0x11)
+#endif
 void dispatch_once(dispatch_once_t *predicate, dispatch_block_t block);
 #include <CoreFoundation/CoreFoundation.h>
 CFDictionaryRef CFNetworkCopySystemProxySettings(void);
@@ -61,3 +71,6 @@ typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned
 NSString *NSStringFromClass(Class c);
 NSString *NSStringFromSelector(SEL s);
 void NSLog(NSString *format, ...);
+#ifdef __cplusplus
+}
+#endif

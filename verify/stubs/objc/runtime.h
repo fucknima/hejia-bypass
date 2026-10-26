@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <objc/objc.h>
 typedef struct objc_method *Method;
 typedef void (*IMP)(void);
@@ -15,3 +18,6 @@ typedef struct objc_method *Method;
 Method *class_copyMethodList(Class cls, unsigned int *outCount);
 SEL method_getName(Method m);
 BOOL sel_isEqual(SEL a, SEL b);
+#ifdef __cplusplus
+}
+#endif
