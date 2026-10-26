@@ -45,6 +45,7 @@ typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned
 - (id)performSelector:(SEL)s;
 @end
 @interface NSString : NSObject
+@property (readonly) const char *UTF8String;
 + (instancetype)stringWithUTF8String:(const char *)s;
 - (BOOL)isEqualToString:(NSString *)s;
 - (BOOL)hasPrefix:(NSString *)s;
@@ -57,6 +58,15 @@ typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned
 + (instancetype)fileURLWithPath:(NSString *)path;
 + (instancetype)URLWithString:(NSString *)s;
 - (NSString *)path;
+@end
+@interface NSUserDefaults : NSObject
++ (instancetype)standardUserDefaults;
+- (BOOL)boolForKey:(NSString *)k;
+- (void)setBool:(BOOL)v forKey:(NSString *)k;
+- (id)objectForKey:(NSString *)k;
+- (void)setObject:(id)o forKey:(NSString *)k;
+- (void)removeObjectForKey:(NSString *)k;
+- (BOOL)synchronize;
 @end
 @interface NSArray<T> : NSObject <NSFastEnumeration>
 + (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
