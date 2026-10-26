@@ -1,64 +1,126 @@
 #pragma once
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <objc/objc.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef signed char BOOL;
 #define YES ((BOOL)1)
 #define NO  ((BOOL)0)
 #define nil ((id)0)
-#define NS_ASSUME_NONNULL_BEGIN
-#define NS_ASSUME_NONNULL_END
+
 typedef long NSInteger;
 typedef unsigned long NSUInteger;
-typedef double NSTimeInterval;
-typedef struct _NSZone NSZone;
+typedef unsigned long NSStringEncoding;
+static const NSStringEncoding NSUTF8StringEncoding = 4;
+
 typedef uint64_t dispatch_time_t;
 typedef long dispatch_once_t;
-#define NSEC_PER_SEC 1000000000ull
-#define DISPATCH_TIME_NOW 0ull
 typedef void (^dispatch_block_t)(void);
 typedef void *dispatch_queue_t;
-void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
+typedef unsigned int qos_class_t;
+#define QOS_CLASS_UTILITY ((qos_class_t)0x11)
+#define NSEC_PER_SEC 1000000000ull
+#define DISPATCH_TIME_NOW 0ull
+
 dispatch_time_t dispatch_time(dispatch_time_t when, int64_t delta);
-void dispatch_after(dispatch_time_t when, void *queue, dispatch_block_t block);
+void dispatch_after(dispatch_time_t when, dispatch_queue_t queue, dispatch_block_t block);
 void *dispatch_get_main_queue(void);
 void *dispatch_get_global_queue(long identifier, unsigned long flags);
-typedef unsigned int qos_class_t;
-#ifndef QOS_CLASS_UTILITY
-#define QOS_CLASS_UTILITY ((qos_class_t)0x11)
-#endif
 void dispatch_once(dispatch_once_t *predicate, dispatch_block_t block);
-#include <CoreFoundation/CoreFoundation.h>
-CFDictionaryRef CFNetworkCopySystemProxySettings(void);
-typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned long *mutationsPtr; unsigned long extra[5]; } NSFastEnumerationState;
-@protocol NSFastEnumeration
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)s objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len;
-@end
+
 @interface NSObject
 + (Class)class;
+- (Class)class;
 - (BOOL)isKindOfClass:(Class)c;
 - (BOOL)respondsToSelector:(SEL)s;
 - (id)performSelector:(SEL)s;
 @end
+
+@protocol NSFastEnumeration
+- (NSUInteger)countByEnumeratingWithState:(void *)s objects:(id *)buf count:(NSUInteger)l;
+@end
+
 @interface NSString : NSObject
 @property (readonly) const char *UTF8String;
 + (instancetype)stringWithUTF8String:(const char *)s;
 - (BOOL)isEqualToString:(NSString *)s;
 - (BOOL)hasPrefix:(NSString *)s;
+- (BOOL)hasSuffix:(NSString *)s;
 - (BOOL)containsString:(NSString *)s;
 - (NSString *)stringByAppendingString:(NSString *)s;
 - (NSString *)stringByReplacingOccurrencesOfString:(NSString *)a withString:(NSString *)b;
 - (NSString *)stringByExpandingTildeInPath;
+- (id)dataUsingEncoding:(NSStringEncoding)e;
 @end
+
+@interface NSArray<T> : NSObject <NSFastEnumeration>
++ (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
+@property (readonly) NSUInteger count;
+- (T)objectAtIndexedSubscript:(NSUInteger)i;
+@end
+
+@interface NSMutableArray<T> : NSArray<T>
++ (instancetype)array;
++ (instancetype)arrayWithCapacity:(NSUInteger)n;
+- (void)addObject:(T)o;
+- (void)removeObjectAtIndex:(NSUInteger)i;
+- (void)removeLastObject;
+- (T)lastObject;
+- (T)firstObject;
+- (NSUInteger)indexOfObject:(T)o;
+@end
+
+@interface NSDictionary<K, V> : NSObject
++ (instancetype)dictionaryWithObjects:(const V [])objects forKeys:(const K [])keys count:(NSUInteger)cnt;
+@end
+
+@interface NSData : NSObject
++ (instancetype)dataWithBytes:(const void *)b length:(unsigned long)l;
+@end
+
+@interface NSError : NSObject
+@property (readonly) long code;
+@property (readonly) NSString *domain;
+@end
+
 @interface NSURL : NSObject
-+ (instancetype)fileURLWithPath:(NSString *)path;
++ (instancetype)fileURLWithPath:(NSString *)p;
 + (instancetype)URLWithString:(NSString *)s;
-- (NSString *)path;
+@property (readonly) NSString *absoluteString;
+@property (readonly) NSString *path;
 @end
+
+@interface NSURLRequest : NSObject
+@property (readonly) NSURL *URL;
++ (instancetype)requestWithURL:(NSURL *)u;
+@end
+
+@interface NSURLResponse : NSObject @end
+
+@interface NSURLSession : NSObject
++ (instancetype)sharedSession;
+- (id)dataTaskWithRequest:(NSURLRequest *)r
+        completionHandler:(void (^)(NSData *, NSURLResponse *, NSError *))h;
+@end
+
+@interface NSFileManager : NSObject
++ (instancetype)defaultManager;
+- (BOOL)fileExistsAtPath:(NSString *)p isDirectory:(BOOL *)d;
+- (BOOL)fileExistsAtPath:(NSString *)p;
+@end
+
+@interface NSBundle : NSObject
++ (instancetype)mainBundle;
+- (NSDictionary *)infoDictionary;
+- (NSString *)pathForResource:(NSString *)n ofType:(NSString *)t;
+- (NSString *)bundleIdentifier;
+- (NSString *)bundlePath;
+- (NSURL *)appStoreReceiptURL;
+@end
+
 @interface NSUserDefaults : NSObject
 + (instancetype)standardUserDefaults;
 - (BOOL)boolForKey:(NSString *)k;
@@ -68,26 +130,27 @@ typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned
 - (void)removeObjectForKey:(NSString *)k;
 - (BOOL)synchronize;
 @end
-@interface NSArray<T> : NSObject <NSFastEnumeration>
-+ (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
+
+@interface NSOperationQueue : NSObject
++ (instancetype)mainQueue;
 @end
-@interface NSDictionary<K, V> : NSObject
-+ (instancetype)dictionaryWithObjects:(const V [])objects forKeys:(const K [])keys count:(NSUInteger)cnt;
+@interface NSNotificationCenter : NSObject
++ (instancetype)defaultCenter;
+- (void)postNotificationName:(NSString *)n object:(id)o;
+- (id)addObserverForName:(NSString *)n object:(id)o queue:(id)q usingBlock:(void (^)(id note))b;
+- (void)removeObserver:(id)o;
 @end
-@interface NSFileManager : NSObject
-+ (instancetype)defaultManager;
-- (BOOL)fileExistsAtPath:(NSString *)p isDirectory:(BOOL *)d;
-- (BOOL)fileExistsAtPath:(NSString *)p;
+
+@interface NSNotification : NSObject @end
+
+@interface NSThread : NSObject
++ (BOOL)isMainThread;
 @end
-@interface NSBundle : NSObject
-+ (instancetype)mainBundle;
-- (NSDictionary *)infoDictionary;
-- (NSString *)pathForResource:(NSString *)n ofType:(NSString *)t;
-- (NSString *)bundleIdentifier;
-@end
+
 NSString *NSStringFromClass(Class c);
 NSString *NSStringFromSelector(SEL s);
 void NSLog(NSString *format, ...);
+
 #ifdef __cplusplus
 }
 #endif

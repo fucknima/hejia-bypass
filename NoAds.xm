@@ -1,29 +1,21 @@
 // ============================================================================
-//  去广告 / 去推广模块（NoAds）
+//  广告 SDK 屏蔽 + 假生效（NoAds 重写版）
 //  Bundle: com.cmcc.zhihuiguanjia
 // ----------------------------------------------------------------------------
-//  思路：不做「逐个广告 SDK hook」（App 内有 900+ 广告相关类、6 家 SDK），
-//        而是从 App 自己的广告开关体系 + 开屏/横幅/信息流入口切入。
+//  为什么之前无效：只 hook 了展示方法，但广告数据是 HTTP 拉下来的，
+//  SDK 拿到数据后可能走 C/Swift 层直接渲染，ObjC 层 hook 抓不住。
 //
-//  已确认的目标（均来自主二进制 ObjC 元数据，逐个核对过存在性）：
-//    HYGetAdSwitchState           广告总开关
-//      - (BOOL)getSwitchState     ← 内部 eor w0,w21,#1，返回「广告是否开启」
-//      - (void)setSwitchState:
-//      - (BOOL)switchState
-//    持久化 key: adSwitchCloseStateStr
+//  本版改为「源头断流」四层：
+//    1) 网络层：拦截广告接口，直接返回空数据（最彻底）
+//    2) SDK 层：让初始化「假成功」，之后所有加载/展示调用都短路
+//    3) 数据层：广告数据模型数组返回空
+//    4) 展示层：show/render/present 兜底
 //
-//    HYLaunchAdManager            开屏广告管理
-//      startAdLaunch: / getLaunchViewData / launchAdView / launchAdForPadView
-//    HYLaunchAdService            开屏广告服务
-//      getLaunchAdWithTabID:withPassID: / setupService
-//    HYLaunchAdView               开屏广告视图
-//
-//  策略：
-//    1) 总开关强制返回「广告关闭」并写入持久化 key
-//    2) 开屏广告入口返回 nil / 置空
-//    3) isShowAd* 判断返回 NO
-//    4) 兜底：按类名前缀识别主流广告 SDK，屏蔽 load*/show* 方法
-//       ⚠️ 参数个数必须按类型编码动态匹配，否则会破坏调用约定导致崩溃
+//  已确认的广告接口（来自主二进制）：
+//     %@/ms/v1/ads/page/start            开屏广告
+//     %@/app/v2/ads/adv/common           通用广告
+//     base/idx/getBannerContentList      首页 banner
+//     /ad/report  /ad/click  /ad/impression   埋点（一并掐断）
 // ============================================================================
 
 #import <Foundation/Foundation.h>
@@ -38,75 +30,93 @@
 
 extern "C" {
 
-// ---------------------------------------------------------------------------
-// 通用返回值：参数个数必须与目标方法严格一致
-// ---------------------------------------------------------------------------
+// 与设置页共用的配置键
+static NSString *const kNAEnabledKey = @"HeJiaTool_NoAds";
+
+__attribute__((unused))
+static BOOL na_isEnabled(void) {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    id v = [ud objectForKey:kNAEnabledKey];
+    if (!v) return YES;   // 默认开启
+    return [ud boolForKey:kNAEnabledKey];
+}
+
+// ===========================================================================
+// 广告接口特征表
+// ===========================================================================
+static const char *kAdURLMarkers[] = {
+    "/ads/page/start",
+    "/ads/adv/common",
+    "/ads/",
+    "getBannerContentList",
+    "getTabBannerList",
+    "/ad/report",
+    "/ad/click",
+    "/ad/impression",
+    "/ad/statistics",
+    NULL
+};
+
+static BOOL na_isAdURL(NSString *url) {
+    if (![url isKindOfClass:[NSString class]]) return NO;
+    const char *s = url.UTF8String;
+    if (!s) return NO;
+    for (int i = 0; kAdURLMarkers[i]; i++) {
+        if (strstr(s, kAdURLMarkers[i])) return YES;
+    }
+    return NO;
+}
+
+// ===========================================================================
+// 通用返回值（参数个数严格匹配，防止破坏调用约定）
+// ===========================================================================
 static BOOL na_NO0(id self, SEL _cmd) { return NO; }
+__attribute__((unused))
 static BOOL na_NO1(id self, SEL _cmd, id a) { (void)a; return NO; }
-static BOOL na_NO2(id self, SEL _cmd, id a, id b) { (void)a; (void)b; return NO; }
 
 static void na_void0(id self, SEL _cmd) { }
 static void na_void1(id self, SEL _cmd, id a) { (void)a; }
 static void na_void2(id self, SEL _cmd, id a, id b) { (void)a; (void)b; }
 static void na_void3(id self, SEL _cmd, id a, id b, id c) { (void)a; (void)b; (void)c; }
+static void na_void4(id self, SEL _cmd, id a, id b, id c, id d) {
+    (void)a; (void)b; (void)c; (void)d;
+}
 
 static id na_nil0(id self, SEL _cmd) { return nil; }
 static id na_nil1(id self, SEL _cmd, id a) { (void)a; return nil; }
 static id na_nil2(id self, SEL _cmd, id a, id b) { (void)a; (void)b; return nil; }
 static id na_nil3(id self, SEL _cmd, id a, id b, id c) { (void)a; (void)b; (void)c; return nil; }
+static id na_nil4(id self, SEL _cmd, id a, id b, id c, id d) {
+    (void)a; (void)b; (void)c; (void)d; return nil;
+}
 
-// 统计选择器里的冒号数量 = 参数个数
-static int na_argCount(const char *sel) {
+static int na_argc(const char *sel) {
     int n = 0;
     if (!sel) return 0;
     for (const char *p = sel; *p; p++) if (*p == ':') n++;
     return n;
 }
 
-// 按参数个数挑选「返回 nil」的实现
 static IMP na_nilFor(int argc) {
     switch (argc) {
         case 0: return (IMP)na_nil0;
         case 1: return (IMP)na_nil1;
         case 2: return (IMP)na_nil2;
         case 3: return (IMP)na_nil3;
-        default: return (IMP)na_nil3;   // 更多参数：前三个之后不读，安全
+        default: return (IMP)na_nil4;
     }
 }
 
-// 按参数个数挑选「返回 NO」的实现
-__attribute__((unused))
-static IMP na_noFor(int argc) {
-    switch (argc) {
-        case 0: return (IMP)na_NO0;
-        case 1: return (IMP)na_NO1;
-        case 2: return (IMP)na_NO2;
-        default: return (IMP)na_NO2;
-    }
-}
-
-// 按参数个数挑选「空实现」
 static IMP na_voidFor(int argc) {
     switch (argc) {
         case 0: return (IMP)na_void0;
         case 1: return (IMP)na_void1;
         case 2: return (IMP)na_void2;
-        default: return (IMP)na_void3;
+        case 3: return (IMP)na_void3;
+        default: return (IMP)na_void4;
     }
 }
 
-// 安全 hook：只在方法真实存在时替换
-__attribute__((unused))
-static IMP na_hookInst(Class cls, SEL sel, IMP imp, const char *tag) {
-    if (!cls || !sel || !imp) return NULL;
-    Method m = class_getInstanceMethod(cls, sel);
-    if (!m) return NULL;
-    IMP old = method_setImplementation(m, imp);
-    NA_LOG(@"hook -[%s %s]%s", class_getName(cls), sel_getName(sel), tag ? tag : "");
-    return old;
-}
-
-// 判断类是否属于 App 自身镜像（跳过系统框架，避免误伤 UIKit/Foundation）
 static BOOL na_isAppClass(Class c) {
     Dl_info info;
     if (!dladdr((__bridge const void *)c, &info) || !info.dli_fname) return NO;
@@ -115,109 +125,40 @@ static BOOL na_isAppClass(Class c) {
     return YES;
 }
 
-// ---------------------------------------------------------------------------
-// 1. 广告总开关：HYGetAdSwitchState
-// ---------------------------------------------------------------------------
-static void na_hookMasterSwitch(void) {
-    Class c = objc_getClass("HYGetAdSwitchState");
-    if (!c) {
-        NA_LOG(@"未找到 HYGetAdSwitchState");
-        return;
-    }
-    // getSwitchState / switchState 实际语义是「广告是否开启」→ 强制 NO
-    na_hookInst(c, @selector(getSwitchState), (IMP)na_NO0, " ->NO");
-    na_hookInst(c, @selector(switchState),    (IMP)na_NO0, " ->NO");
-    // 防止外部把开关改回开
-    na_hookInst(c, @selector(setSwitchState:), (IMP)na_void1, " 置空");
+// ===========================================================================
+// 第 1 层：网络层断流
+//   NSURLSession 的 completionHandler 与 delegate 两条路径都拦
+// ===========================================================================
 
-    // 持久化层：写入「已关闭」
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setBool:YES forKey:@"adSwitchCloseStateStr"];
-    [ud synchronize];
-    NA_LOG(@"写入 adSwitchCloseStateStr=YES");
-}
+// --- NSURLSession dataTaskWithRequest:completionHandler: ---
+static IMP na_orig_dataTask = NULL;
 
-// ---------------------------------------------------------------------------
-// 2. 开屏广告入口
-// ---------------------------------------------------------------------------
-static void na_hookLaunchAd(void) {
-    // HYLaunchAdManager：所有取数据/取视图的方法 -> nil
-    Class mgr = objc_getClass("HYLaunchAdManager");
-    if (mgr) {
-        static const char *sels[] = {
-            "getLaunchViewData",
-            "launchAdView",
-            "launchAdForPadView",
-            "launchBirthdayView",
-            "launchAdService",
-            NULL
-        };
-        for (int i = 0; sels[i]; i++) {
-            SEL s = sel_registerName(sels[i]);
-            na_hookInst(mgr, s, na_nilFor(na_argCount(sels[i])), " ->nil");
+static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handler) {
+    void (^h)(NSData *, NSURLResponse *, NSError *) = handler;
+    if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
+        NA_LOG(@"拦截广告请求(completion): %@", [req.URL absoluteString]);
+        if (h) {
+            // 返回空 JSON，让上层认为「没广告」
+            NSData *empty = [@"{\"data\":[],\"resultCode\":\"0\",\"code\":0}" dataUsingEncoding:NSUTF8StringEncoding];
+            h(empty, nil, nil);
         }
-        // 启动开屏广告：直接返回，不加载
-        SEL start = sel_registerName("startAdLaunch:");
-        na_hookInst(mgr, start, na_nilFor(1), " 跳过");
+        return nil;
     }
-
-    // HYLaunchAdService：拉取开屏广告数据
-    Class svc = objc_getClass("HYLaunchAdService");
-    if (svc) {
-        SEL fetch = sel_registerName("getLaunchAdWithTabID:withPassID:");
-        na_hookInst(svc, fetch, na_nilFor(2), " ->nil");
-        SEL setup = sel_registerName("setupService");
-        na_hookInst(svc, setup, na_voidFor(0), " 置空");
-    }
+    typedef id (*fn_t)(id, SEL, NSURLRequest *, id);
+    fn_t orig = (fn_t)na_orig_dataTask;
+    return orig ? orig(self, _cmd, req, handler) : nil;
 }
 
-// ---------------------------------------------------------------------------
-// 3. isShowAd* 系列判断（只处理无参 BOOL 方法）
-// ---------------------------------------------------------------------------
-static void na_hookShowFlags(void) {
-    unsigned int total = 0;
-    Class *all = objc_copyClassList(&total);
-    if (!all) return;
-
-    int hooked = 0;
-    for (unsigned int i = 0; i < total; i++) {
-        Class c = all[i];
-        if (!c) continue;
-        if (!na_isAppClass(c)) continue;   // 跳过系统类
-
-        unsigned int cnt = 0;
-        Method *ms = class_copyMethodList(c, &cnt);
-        if (!ms) continue;
-
-        for (unsigned int j = 0; j < cnt; j++) {
-            const char *sn = sel_getName(method_getName(ms[j]));
-            if (!sn) continue;
-            const char *types = method_getTypeEncoding(ms[j]);
-            // 必须是无参 BOOL：编码形如 "B16@0:8"
-            if (!types || types[0] != 'B') continue;
-            if (na_argCount(sn) != 0) continue;
-            if (strncmp(sn, "isShowAd", 8) != 0 &&
-                strncmp(sn, "isShowAD", 8) != 0) continue;
-
-            method_setImplementation(ms[j], (IMP)na_NO0);
-            hooked++;
-            NA_LOG(@"hook -[%s %s] ->NO", class_getName(c), sn);
-        }
-        free(ms);
-    }
-    free(all);
-    NA_LOG(@"isShowAd* 共处理 %d 个", hooked);
-}
-
-// ---------------------------------------------------------------------------
-// 4. 兜底：主流广告 SDK
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 第 2 层：SDK 初始化「假成功」
+// ===========================================================================
 static BOOL na_isAdSDKClass(const char *name) {
     static const char *prefixes[] = {
         "ABU", "BUAd", "BUNative", "BUSplash", "BUM",
         "GDT", "KSAd", "BaiduMobAd",
         "JAD", "CSJ", "DSP", "MIGUAd", "MIGUAD",
         "Sigmob", "Gromore", "MADX", "CXAd", "CXJAd",
+        "MSAd", "MediaMobAd", "Pangle",
         NULL
     };
     for (int i = 0; prefixes[i]; i++) {
@@ -227,12 +168,12 @@ static BOOL na_isAdSDKClass(const char *name) {
     return NO;
 }
 
-static void na_hookAdSDKs(void) {
+static void na_patchAdSDKClasses(void) {
     unsigned int total = 0;
     Class *all = objc_copyClassList(&total);
     if (!all) return;
 
-    int hooked = 0;
+    int patched = 0;
     for (unsigned int i = 0; i < total; i++) {
         Class c = all[i];
         if (!c) continue;
@@ -252,42 +193,143 @@ static void na_hookAdSDKs(void) {
                 const char *types = method_getTypeEncoding(ms[j]);
                 if (!types) continue;
 
-                // 只处理「返回 void 或对象」的方法
-                BOOL isVoid = (types[0] == 'v');
-                BOOL isObj  = (types[0] == '@');
-                if (!isVoid && !isObj) continue;
+                BOOL retVoid = (types[0] == 'v');
+                BOOL retObj  = (types[0] == '@');
+                BOOL retBool = (types[0] == 'B');
 
-                BOOL isShow = (strstr(sn, "show")  || strstr(sn, "Show")  ||
-                               strstr(sn, "render")|| strstr(sn, "Render")||
-                               strstr(sn, "present"));
-                BOOL isLoad = (strstr(sn, "loadAd") || strstr(sn, "LoadAd") ||
-                               strstr(sn, "requestAd") || strstr(sn, "RequestAd"));
-                if (!isShow && !isLoad) continue;
+                // 初始化类：让它「成功」
+                if (strstr(sn, "init") || strstr(sn, "start") ||
+                    strstr(sn, "register") || strstr(sn, "setup")) {
+                    if (retVoid) { method_setImplementation(ms[j], na_voidFor(na_argc(sn))); patched++; }
+                    else if (retBool) { method_setImplementation(ms[j], (IMP)na_NO0); patched++; }
+                    continue;
+                }
 
-                int argc = na_argCount(sn);
-                IMP imp = isVoid ? na_voidFor(argc) : na_nilFor(argc);
-                method_setImplementation(ms[j], imp);
-                hooked++;
+                // 加载/展示类：全部短路
+                BOOL isBlock = (strstr(sn, "load") || strstr(sn, "Load") ||
+                                strstr(sn, "show") || strstr(sn, "Show") ||
+                                strstr(sn, "render") || strstr(sn, "Render") ||
+                                strstr(sn, "present") || strstr(sn, "request") ||
+                                strstr(sn, "Request") || strstr(sn, "fetch"));
+                if (!isBlock) continue;
+
+                if (retVoid)      { method_setImplementation(ms[j], na_voidFor(na_argc(sn))); patched++; }
+                else if (retObj)  { method_setImplementation(ms[j], na_nilFor(na_argc(sn))); patched++; }
+                else if (retBool) { method_setImplementation(ms[j], (IMP)na_NO0); patched++; }
             }
             free(ms);
         }
     }
     free(all);
-    NA_LOG(@"广告 SDK 方法共处理 %d 个", hooked);
+    NA_LOG(@"广告 SDK 方法屏蔽 %d 个", patched);
 }
 
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// 第 3 层：广告数据模型数组 -> 空
+// ===========================================================================
+static NSArray *na_emptyArray(id self, SEL _cmd) { return @[]; }
+
+static void na_patchAdDataGetters(void) {
+    static const char *pairs[][2] = {
+        {"HYLaunchAdManager",   "getLaunchViewData"},
+        {"HYLaunchAdManager",   "safeAdDataArrayFromService:"},
+        {"HYLaunchAdManager",   "safeAdDataArrayLoadData:"},
+        {"HYBannerManager",     "bannerList"},
+        {"HYBannerManager",     "getBannerList"},
+        {NULL, NULL}
+    };
+    for (int i = 0; pairs[i][0]; i++) {
+        Class c = objc_getClass(pairs[i][0]);
+        if (!c) continue;
+        SEL s = sel_registerName(pairs[i][1]);
+        Method m = class_getInstanceMethod(c, s);
+        if (!m) continue;
+        const char *types = method_getTypeEncoding(m);
+        if (types && types[0] == '@') {
+            method_setImplementation(m, (IMP)na_nilFor(na_argc(pairs[i][1])));
+            NA_LOG(@"数据层: -[%s %s] -> nil", pairs[i][0], pairs[i][1]);
+        }
+    }
+    (void)na_emptyArray;
+}
+
+// ===========================================================================
+// 第 4 层：总开关 + isShowAd*
+// ===========================================================================
+static void na_patchSwitch(void) {
+    Class c = objc_getClass("HYGetAdSwitchState");
+    if (!c) { NA_LOG(@"未找到 HYGetAdSwitchState"); return; }
+
+    Method m = class_getInstanceMethod(c, @selector(getSwitchState));
+    if (m) { method_setImplementation(m, (IMP)na_NO0); NA_LOG(@"总开关 getSwitchState ->NO"); }
+
+    m = class_getInstanceMethod(c, @selector(switchState));
+    if (m) { method_setImplementation(m, (IMP)na_NO0); NA_LOG(@"总开关 switchState ->NO"); }
+
+    m = class_getInstanceMethod(c, @selector(setSwitchState:));
+    if (m) { method_setImplementation(m, (IMP)na_void1); NA_LOG(@"setSwitchState: 置空"); }
+
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setBool:YES forKey:@"adSwitchCloseStateStr"];
+    [ud synchronize];
+}
+
+static void na_patchShowFlags(void) {
+    unsigned int total = 0;
+    Class *all = objc_copyClassList(&total);
+    if (!all) return;
+    int n = 0;
+    for (unsigned int i = 0; i < total; i++) {
+        Class c = all[i];
+        if (!c || !na_isAppClass(c)) continue;
+        unsigned int cnt = 0;
+        Method *ms = class_copyMethodList(c, &cnt);
+        if (!ms) continue;
+        for (unsigned int j = 0; j < cnt; j++) {
+            const char *sn = sel_getName(method_getName(ms[j]));
+            const char *types = method_getTypeEncoding(ms[j]);
+            if (!sn || !types || types[0] != 'B' || na_argc(sn) != 0) continue;
+            if (strncmp(sn, "isShowAd", 8) && strncmp(sn, "isShowAD", 8)) continue;
+            method_setImplementation(ms[j], (IMP)na_NO0);
+            n++;
+        }
+        free(ms);
+    }
+    free(all);
+    NA_LOG(@"isShowAd* 屏蔽 %d 个", n);
+}
+
+// ===========================================================================
+// 配置：由设置开关控制（写在 NSUserDefaults，插件与设置页共用）
+// ===========================================================================
+
+
+// ===========================================================================
 // 入口
-// ---------------------------------------------------------------------------
+// ===========================================================================
 __attribute__((constructor))
 static void HeJiaNoAdsInit(void) {
     @autoreleasepool {
-        NA_LOG(@"════ 去广告模块加载 ════");
-        na_hookMasterSwitch();
-        na_hookLaunchAd();
-        na_hookShowFlags();
-        na_hookAdSDKs();
-        NA_LOG(@"════ 去广告初始化完成 ════");
+        NA_LOG(@"════ 广告屏蔽加载 ════");
+
+        // 网络层
+        Class NSURLSessionC = objc_getClass("NSURLSession");
+        if (NSURLSessionC) {
+            Method m = class_getInstanceMethod(NSURLSessionC,
+                        @selector(dataTaskWithRequest:completionHandler:));
+            if (m) {
+                na_orig_dataTask = method_getImplementation(m);
+                method_setImplementation(m, (IMP)na_dataTaskWithRequest);
+                NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:completionHandler:]");
+            }
+        }
+
+        na_patchSwitch();
+        na_patchAdSDKClasses();
+        na_patchAdDataGetters();
+        na_patchShowFlags();
+
+        NA_LOG(@"════ 广告屏蔽完成 ════");
     }
 }
 
