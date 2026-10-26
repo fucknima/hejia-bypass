@@ -24,8 +24,11 @@
 #import <unistd.h>
 #import <string.h>
 #import <dlfcn.h>
-// iOS SDK 的 <sys/ptrace.h> 未默认引入，ptrace 需要显式声明
-#include <sys/ptrace.h>
+// iOS SDK 不提供 <sys/ptrace.h>，直接内联声明（tweak 通用做法）
+#ifndef PT_DENY_ATTACH
+#define PT_DENY_ATTACH 31
+#endif
+extern int ptrace(int request, pid_t pid, caddr_t addr, int data);
 
 #include <substrate.h>
 
