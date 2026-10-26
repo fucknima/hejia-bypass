@@ -324,12 +324,24 @@ static void HeJiaNoAdsInit(void) {
             }
         }
 
+        // 只做最轻量的：总开关（几乎零成本）
         na_patchSwitch();
-        na_patchAdSDKClasses();
-        na_patchAdDataGetters();
-        na_patchShowFlags();
 
-        NA_LOG(@"════ 广告屏蔽完成 ════");
+        // 全量类扫描很重（约 50 万类候选），绝不能放在启动同步路径，
+        // 否则会和 UI 初始化叠加导致 0x8BADF00D 看门狗闪退。
+        // 延后 2.5 秒到后台队列执行。
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.5 * NSEC_PER_SEC)),
+                       dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            @autoreleasepool {
+                NA_LOG(@"开始延后扫描广告 SDK");
+                na_patchAdSDKClasses();
+                na_patchAdDataGetters();
+                na_patchShowFlags();
+                NA_LOG(@"════ 广告屏蔽完成 ════");
+            }
+        });
+
+        NA_LOG(@"════ 广告屏蔽初始化完成（扫描已延后）════");
     }
 }
 

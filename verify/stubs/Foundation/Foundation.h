@@ -30,6 +30,7 @@ void dispatch_after(dispatch_time_t when, dispatch_queue_t queue, dispatch_block
 void *dispatch_get_main_queue(void);
 void *dispatch_get_global_queue(long identifier, unsigned long flags);
 void dispatch_once(dispatch_once_t *predicate, dispatch_block_t block);
+void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 
 @interface NSObject
 + (Class)class;

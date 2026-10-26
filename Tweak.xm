@@ -474,10 +474,18 @@ static void HeJiaBypassInit(void) {
     @autoreleasepool {
         HM_LOG(@"════ 移动爱家检测绕过 v1.0.0 已加载 ════");
 
+        // 轻量钩子：直接 hook 指定类，成本极低
         HMHookXJSpeechManager();
         HMHookBlackbees();
         HMInstallCHooks();
-        HMHookMainAppExtra();
+
+        // 重活：全类扫描（几十万类）→ 延后到后台，避免阻塞首屏
+        // 否则会与 UI 初始化叠加触发 0x8BADF00D 看门狗
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)),
+                       dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            @autoreleasepool { HMHookMainAppExtra(); }
+        });
+
         HMScheduleLateHooks();
 
         HM_LOG(@"════ 初始化完成 ════");
