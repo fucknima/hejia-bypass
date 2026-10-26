@@ -29,7 +29,11 @@ jobs:
           # 官方 SDK 仓库
           rm -rf "$THEOS/sdks"
           git clone --depth 1 https://github.com/theos/sdks.git "$THEOS/sdks"
-          # 选一个可用的 SDK
+          # 下载 vendor 预编译库（libsubstrate / libhooker 等），缺少会报
+          # "The vendor/include and/or vendor/lib directories are missing"
+          "$THEOS/bin/update-theos" || bash "$THEOS/bin/update-theos.sh"
+          ls "$THEOS/vendor" 2>/dev/null && ls "$THEOS/vendor/lib" 2>/dev/null | head
+          # 选一个可用的 SDK（优先 16.5）
           ls "$THEOS/sdks" | grep -i iphoneos | head -20
 
       - name: Build
