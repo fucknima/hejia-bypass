@@ -73,13 +73,22 @@ jobs:
             echo "== $f"; file "$f"; lipo -info "$f" || true
           done
 
+      - name: Stage artifact
+        if: success()
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          # .theos 是隐藏目录，upload-artifact@v4 默认不收隐藏文件的产物
+          cp -f .theos/obj/HeJiaBypass.dylib out/
+          file out/HeJiaBypass.dylib
+          lipo -info out/HeJiaBypass.dylib
+
       - name: Upload dylib
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: HeJiaBypass-dylib
-          path: |
-            **/HeJiaBypass.dylib
+          path: out/HeJiaBypass.dylib
           if-no-files-found: error
 
       - name: Upload deb
