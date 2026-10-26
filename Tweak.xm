@@ -294,6 +294,14 @@ static BOOL HMFileExistsAtPath(id self, SEL _cmd, NSString *path, BOOL *isDirect
             if (isDirectory) *isDirectory = NO;
             return NO;
         }
+        // 签名来源判断：伪装成 App Store 正版
+        // - embedded.mobileprovision 存在 => 侧载/重签，必须报「不存在」
+        // - sandboxReceipt            => 沙盒包，同样按不存在处理
+        if ([path containsString:@"embedded.mobileprovision"] ||
+            [path containsString:@"sandboxReceipt"]) {
+            if (isDirectory) *isDirectory = NO;
+            return NO;
+        }
     }
     if (original_fileExistsAtPath) {
         return original_fileExistsAtPath(self, _cmd, path, isDirectory);
@@ -340,6 +348,30 @@ static int HM_ptrace(int request, pid_t pid, caddr_t addr, int data) {
     return 0;
 }
 
+// ---------------------------------------------------------------------------
+// 4.5 签名来源伪装（关键：消除「重签名风险」弹窗）
+//
+// 主二进制里没有任何 SecStaticCode/SecCodeCheckValidity 系统校验调用，
+// 只用到了这些「路径/存在性」判断，然后上报服务端：
+//     appStoreReceiptURL   (NSBundle)
+//     sandboxReceipt       (receipt 路径含此片段 = 沙盒/侧载)
+//     embedded.mobileprovision
+// 沙盒注入/侧载时 appStoreReceiptURL 会变成 /var/containers/.../sandboxReceipt，
+// 服务端据此判定「重签名」并下发弹窗。
+// 这里统一伪装成 App Store 正版环境。
+// ---------------------------------------------------------------------------
+static NSURL *(*original_appStoreReceiptURL)(id, SEL) = NULL;
+static NSURL *HM_appStoreReceiptURL(id self, SEL _cmd) {
+    // 返回标准 App Store receipt 路径（真实文件不存在也无妨，
+    // 检测方通常只判断路径形态，不做真实校验）
+    NSString *path = [@"~/Documents/../StoreKit/receipt" stringByExpandingTildeInPath];
+    (void)path;
+    return [NSURL fileURLWithPath:@"/var/mobile/Containers/Bundle/Application/StoreKit/receipt"];
+}
+
+// 文件是否存在：把 embedded.mobileprovision / sandboxReceipt 的判断也纳入控制
+static BOOL HMFileExistsAtPath(id self, SEL _cmd, NSString *path, BOOL *isDirectory);
+
 // 系统代理：返回空字典（既无 HTTP 也无 HTTPS 代理）
 static CFDictionaryRef (*original_copyProxySettings)(void) = NULL;
 static CFDictionaryRef HM_CopySystemProxySettings(void) {
@@ -352,7 +384,47 @@ static CFDictionaryRef HM_CopySystemProxySettings(void) {
                               &kCFTypeDictionaryValueCallBacks);
 }
 
+// ---------------------------------------------------------------------------
+// NSBundle pathForResource:ofType: —— 拦截 embedded.mobileprovision 查询
+// App 可能用 pathForResource:@"embedded" ofType:@"mobileprovision" 取路径
+// ---------------------------------------------------------------------------
+static NSString *(*original_pathForResource)(id, SEL, NSString *, NSString *) = NULL;
+
+static NSString *HM_pathForResourceOfType(id self, SEL _cmd, NSString *name, NSString *type) {
+    if ([name isEqualToString:@"embedded"] && [type isEqualToString:@"mobileprovision"]) {
+        HM_LOG(@"拦截 pathForResource:embedded mobileprovision -> nil");
+        return nil;
+    }
+    if (original_pathForResource) {
+        return original_pathForResource(self, _cmd, name, type);
+    }
+    return nil;
+}
+
 static void HMInstallCHooks(void) {
+    // NSBundle.appStoreReceiptURL —— 侧载时指向 sandboxReceipt
+    Class NSBundleCls = objc_getClass("NSBundle");
+    if (NSBundleCls) {
+        Method m = class_getInstanceMethod(NSBundleCls, @selector(appStoreReceiptURL));
+        if (m) {
+            original_appStoreReceiptURL = (NSURL *(*)(id, SEL))method_getImplementation(m);
+            method_setImplementation(m, (IMP)HM_appStoreReceiptURL);
+            HM_LOG(@"hook -[NSBundle appStoreReceiptURL] -> 伪装 App Store");
+        }
+    }
+
+    // NSBundle pathForResource:ofType:
+    Class NSBundleC = objc_getClass("NSBundle");
+    if (NSBundleC) {
+        Method m = class_getInstanceMethod(NSBundleC, @selector(pathForResource:ofType:));
+        if (m) {
+            original_pathForResource = (NSString *(*)(id, SEL, NSString *, NSString *))
+                                        method_getImplementation(m);
+            method_setImplementation(m, (IMP)HM_pathForResourceOfType);
+            HM_LOG(@"hook -[NSBundle pathForResource:ofType:]");
+        }
+    }
+
     Class NSFileMgr = objc_getClass("NSFileManager");
     if (NSFileMgr) {
         Method m = class_getInstanceMethod(NSFileMgr, @selector(fileExistsAtPath:isDirectory:));

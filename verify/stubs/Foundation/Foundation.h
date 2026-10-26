@@ -50,6 +50,13 @@ typedef struct { unsigned long state; id __unsafe_unretained *itemsPtr; unsigned
 - (BOOL)hasPrefix:(NSString *)s;
 - (BOOL)containsString:(NSString *)s;
 - (NSString *)stringByAppendingString:(NSString *)s;
+- (NSString *)stringByReplacingOccurrencesOfString:(NSString *)a withString:(NSString *)b;
+- (NSString *)stringByExpandingTildeInPath;
+@end
+@interface NSURL : NSObject
++ (instancetype)fileURLWithPath:(NSString *)path;
++ (instancetype)URLWithString:(NSString *)s;
+- (NSString *)path;
 @end
 @interface NSArray<T> : NSObject <NSFastEnumeration>
 + (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
