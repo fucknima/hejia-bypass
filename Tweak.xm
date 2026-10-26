@@ -24,6 +24,8 @@
 #import <unistd.h>
 #import <string.h>
 #import <dlfcn.h>
+// iOS SDK 的 <sys/ptrace.h> 未默认引入，ptrace 需要显式声明
+#include <sys/ptrace.h>
 
 #include <substrate.h>
 
