@@ -1,0 +1,3382 @@
+XJSpeechManager:
+Contents of (__DATA,__objc_classlist) section
+00000000000ad778 0xb4e58
+           isa 0xb4e18
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xada82 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 76
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x92fd0 _TtC15XJSpeechManager15PCMStreamPlayer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xad978
+                    entsize 32
+                      count 8
+			   offset 0x87478 16
+			     name 0x94e50 engine
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87480 24
+			     name 0x95787 playerNode
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87488 32
+			     name 0x94652 audioFormat
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87490 40
+			     name 0x947fe bufferQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87498 48
+			     name 0x956ca pcmBufferPool
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x874a0 56
+			     name 0x95338 isPlaying
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x874a8 64
+			     name 0x94c60 currentSampleRate
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x874b0 72
+			     name 0x948f2 channels
+			     type 0x92eb0 
+			alignment 2
+			     size 4
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xad930 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x92fd0 _TtC15XJSpeechManager15PCMStreamPlayer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad780 0xb50e0
+           isa 0xb50a0
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xade8a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 128
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93110 _TtC15XJSpeechManager13AudioRecorder
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xadd60
+                    entsize 32
+                      count 9
+			   offset 0x87ba8 16
+			     name 0x946c0 audioQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87bb0 24
+			     name 0x94652 audioFormat
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0x87bb8 64
+			     name 0x93a17 buffers
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87bc0 72
+			     name 0x947df bufferCount
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87bc8 80
+			     name 0x9480b bufferSize
+			     type 0x92eb0 
+			alignment 2
+			     size 4
+			   offset 0x87bd0 88
+			     name 0x94c36 currentPacket
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87bd8 96
+			     name 0x95354 isRecording
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x87be0 104
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x87be8 120
+			     name 0x946d0 audioQueueInputCallback
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xadd18 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93110 _TtC15XJSpeechManager13AudioRecorder
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad788 0xb1870 _OBJC_CLASS_$__TtC15XJSpeechManager12AudioManager
+           isa 0xb5288 _OBJC_METACLASS_$__TtC15XJSpeechManager12AudioManager
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb1812 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 120
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93140 _TtC15XJSpeechManager12AudioManager
+              baseMethods 0xb16d0 (struct method_list_t *)
+		   entsize 24
+		     count 13
+		      name 0x9536f isRunning
+		     types 0x925d1 B16@0:8
+		       imp 0x6de4 
+		      name 0x95d49 setIsRunning:
+		     types 0x92582 v20@0:8B16
+		       imp 0x6e68 
+		      name 0x95127 initWithDelegate:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x6fb8 
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x7080 
+		      name 0x95969 requestPermissionAndStart
+		     types 0x92ee8 v16@0:8
+		       imp 0x7934 
+		      name 0x95ee2 startAndReturnError:
+		     types 0x925f7 B24@0:8^@16
+		       imp 0x8820 
+		      name 0x95f78 stop
+		     types 0x92ee8 v16@0:8
+		       imp 0x8d20 
+		      name 0x945cd appendPCMData:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x9104 
+		      name 0x9494c clearPlaybackBuffer
+		     types 0x92ee8 v16@0:8
+		       imp 0x93d4 
+		      name 0x945e0 appendPCMData:sampleRate:
+		     types 0x9260e v32@0:8@16d24
+		       imp 0x98b4 
+		      name 0x945fa appendPCMDataWithFixedSample:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x9c18 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0xa8a8 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x70a4 
+            baseProtocols 0x0
+                    ivars 0xadf40
+                    entsize 32
+                      count 11
+			   offset 0xb5280 8
+			     name 0x9470b audioUnit
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5240 16
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5248 24
+			     name 0x9576e playbackBuffer
+			     type 0x92eb0 
+			alignment 3
+			     size 32
+			   offset 0xb5250 56
+			     name 0x947ed bufferLock
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5258 64
+			     name 0x951b8 inputBuffer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5238 72
+			     name 0x94304 recordFramePool
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5260 80
+			     name 0x95834 recordPoolLock
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5268 88
+			     name 0x95810 recordPoolAvailableIndices
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5230 96
+			     name 0x9536f isRunning
+			     type 0x92625 B
+			alignment 0
+			     size 1
+			   offset 0xb5270 104
+			     name 0x93c55 processingQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5278 112
+			     name 0x961d8 workQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0xae0a8
+                    entsize 16
+                      count 1
+			     name 0x9536f isRunning
+			attributes 0x939af TB,N,VisRunning
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xadef8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93140 _TtC15XJSpeechManager12AudioManager
+              baseMethods 0xb1680 (struct method_list_t *)
+		   entsize 24
+		     count 3
+		      name 0x95a58 sampleRate
+		     types 0x925af d16@0:8
+		       imp 0x6dc4 
+		      name 0x948f2 channels
+		     types 0x925b7 I16@0:8
+		       imp 0x6ddc 
+		      name 0x9599c resamplePCMWithData:fromSampleRate:toSampleRate:
+		     types 0x925c0 @40@0:8@16d24d32
+		       imp 0x9400 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0xaded0
+                    entsize 16
+                      count 2
+			     name 0x95a58 sampleRate
+			attributes 0x94128 Td,N,R
+			     name 0x948f2 channels
+			attributes 0x93ac8 TI,N,R
+00000000000ad790 0xb1e00 _OBJC_CLASS_$__TtC15XJSpeechManager14XJSpeechParams
+           isa 0xb5338 _OBJC_METACLASS_$__TtC15XJSpeechManager14XJSpeechParams
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb1da2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 184
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93170 _TtC15XJSpeechManager14XJSpeechParams
+              baseMethods 0xb1a38 (struct method_list_t *)
+		   entsize 24
+		     count 36
+		      name 0x945b0 appId
+		     types 0x92ee0 @16@0:8
+		       imp 0x12200 
+		      name 0x95b56 setAppId:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x1220c 
+		      name 0x94590 apiSecret
+		     types 0x92ee0 @16@0:8
+		       imp 0x12218 
+		      name 0x95b3a setApiSecret:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12224 
+		      name 0x95e38 sha256Hash
+		     types 0x92ee0 @16@0:8
+		       imp 0x12230 
+		      name 0x95db3 setSha256Hash:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x1223c 
+		      name 0x94572 uid
+		     types 0x92ee0 @16@0:8
+		       imp 0x12248 
+		      name 0x93e26 setUid:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x1229c 
+		      name 0x93b4e key
+		     types 0x92ee0 @16@0:8
+		       imp 0x122e4 
+		      name 0x94482 setKey:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x122f0 
+		      name 0x9400a bleName
+		     types 0x92ee0 @16@0:8
+		       imp 0x122fc 
+		      name 0x95be2 setBleName:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12308 
+		      name 0x9479e bleAddress
+		     types 0x92ee0 @16@0:8
+		       imp 0x12314 
+		      name 0x95bc9 setBleAddress:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12320 
+		      name 0x94db8 deviceId
+		     types 0x92ee0 @16@0:8
+		       imp 0x1232c 
+		      name 0x95c84 setDeviceId:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12338 
+		      name 0x9471e authCode
+		     types 0x92ee0 @16@0:8
+		       imp 0x12344 
+		      name 0x95b77 setAuthCode:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12350 
+		      name 0x94624 area
+		     types 0x92ee0 @16@0:8
+		       imp 0x1235c 
+		      name 0x95b69 setArea:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x12368 
+		      name 0x95032 host
+		     types 0x92ee0 @16@0:8
+		       imp 0x12374 
+		      name 0x95cd7 setHost:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x123d8 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x1251c 
+		      name 0x945c5 appId:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x1259c 
+		      name 0x9459c apiSecret:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x125b4 
+		      name 0x95e47 sha256Hash:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x125cc 
+		      name 0x960c3 uid:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x12620 
+		      name 0x953d8 key:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x12688 
+		      name 0x947cd bleName:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x126a0 
+		      name 0x947b6 bleAddress:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x126b8 
+		      name 0x94dc2 deviceId:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x126d0 
+		      name 0x9472c authCode:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x126e8 
+		      name 0x94636 area:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x12700 
+		      name 0x9503c host:
+		     types 0x925e4 @24@0:8@16
+		       imp 0x12718 
+		      name 0x94822 build
+		     types 0x92ee0 @16@0:8
+		       imp 0x1272c 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x12760 
+            baseProtocols 0x0
+                    ivars 0xae108
+                    entsize 32
+                      count 11
+			   offset 0xb52e0 8
+			     name 0x945b0 appId
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb52e8 24
+			     name 0x94590 apiSecret
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb52f0 40
+			     name 0x95e38 sha256Hash
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb52f8 56
+			     name 0x94572 uid
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5300 72
+			     name 0x93b4e key
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5308 88
+			     name 0x9400a bleName
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5310 104
+			     name 0x9479e bleAddress
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5318 120
+			     name 0x94db8 deviceId
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5320 136
+			     name 0x9471e authCode
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5328 152
+			     name 0x94624 area
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5330 168
+			     name 0x95032 host
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0xae270
+                    entsize 16
+                      count 11
+			     name 0x945b0 appId
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94590 apiSecret
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x95e38 sha256Hash
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94572 uid
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x93b4e key
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x9400a bleName
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x9479e bleAddress
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94db8 deviceId
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x9471e authCode
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94624 area
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x95032 host
+			attributes 0x93ff0 T@"NSString",N,C
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xae0c0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93170 _TtC15XJSpeechManager14XJSpeechParams
+              baseMethods 0xb1a18 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x94068 builder
+		     types 0x92ee0 @16@0:8
+		       imp 0x12574 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad798 0xb53a0
+           isa 0xb5360
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xae41a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 64
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x931a0 _TtC15XJSpeechManager17AIWebSocketConfig
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xae370
+                    entsize 32
+                      count 5
+			   offset 0x87df0 16
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87df8 24
+			     name 0x95735 pingInterval
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87e00 32
+			     name 0x9454b timeoutInterval
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x87e08 40
+			     name 0x96093 token
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x87e10 56
+			     name 0x956aa params
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xae328 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x931a0 _TtC15XJSpeechManager17AIWebSocketConfig
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7a0 0xb21e8 _OBJC_CLASS_$__TtC15XJSpeechManager12DeviceEntity
+           isa 0xb54c0 _OBJC_METACLASS_$__TtC15XJSpeechManager12DeviceEntity
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb218a (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 57
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x931d0 _TtC15XJSpeechManager12DeviceEntity
+              baseMethods 0xb2018 (struct method_list_t *)
+		   entsize 24
+		     count 15
+		      name 0x94750 availableDuration
+		     types 0x92714 q16@0:8
+		       imp 0x15930 
+		      name 0x95b8f setAvailableDuration:
+		     types 0x9258d v24@0:8q16
+		       imp 0x159b4 
+		      name 0x94792 bindTime
+		     types 0x92714 q16@0:8
+		       imp 0x15a90 
+		      name 0x95bae setBindTime:
+		     types 0x9258d v24@0:8q16
+		       imp 0x15b14 
+		      name 0x94db8 deviceId
+		     types 0x92ee0 @16@0:8
+		       imp 0x15bf0 
+		      name 0x95c84 setDeviceId:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x15cbc 
+		      name 0x94dd4 deviceStatus
+		     types 0x92714 q16@0:8
+		       imp 0x15e38 
+		      name 0x95c9e setDeviceStatus:
+		     types 0x9258d v24@0:8q16
+		       imp 0x15ebc 
+		      name 0x94e8f expirationTime
+		     types 0x92714 q16@0:8
+		       imp 0x15f98 
+		      name 0x95cbe setExpirationTime:
+		     types 0x9258d v24@0:8q16
+		       imp 0x1601c 
+		      name 0x93b20 isTrial
+		     types 0x925d1 B16@0:8
+		       imp 0x160f8 
+		      name 0x95d59 setIsTrial:
+		     types 0x92582 v20@0:8B16
+		       imp 0x1617c 
+		      name 0x94da0 description
+		     types 0x92ee0 @16@0:8
+		       imp 0x16c98 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x16fd8 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x17034 
+            baseProtocols 0x0
+                    ivars 0xae4a8
+                    entsize 32
+                      count 6
+			   offset 0xb5480 8
+			     name 0x94750 availableDuration
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb5488 16
+			     name 0x94792 bindTime
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb5490 24
+			     name 0x94db8 deviceId
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5498 40
+			     name 0x94dd4 deviceStatus
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb54a0 48
+			     name 0x94e8f expirationTime
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb54a8 56
+			     name 0x93b20 isTrial
+			     type 0x92625 B
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0xae570
+                    entsize 16
+                      count 7
+			     name 0x94750 availableDuration
+			attributes 0x93b00 Tq,N,VavailableDuration
+			     name 0x94792 bindTime
+			attributes 0x94198 Tq,N,VbindTime
+			     name 0x94db8 deviceId
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94dd4 deviceStatus
+			attributes 0x941b0 Tq,N,VdeviceStatus
+			     name 0x94e8f expirationTime
+			attributes 0x93b60 Tq,N,VexpirationTime
+			     name 0x93b20 isTrial
+			attributes 0x94105 TB,N,VisTrial
+			     name 0x94da0 description
+			attributes 0x93a00 T@"NSString",N,R
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xae460 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x931d0 _TtC15XJSpeechManager12DeviceEntity
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7a8 0xb2530 _OBJC_CLASS_$__TtC15XJSpeechManager18AudioDeviceManager
+           isa 0xb5630 _OBJC_METACLASS_$__TtC15XJSpeechManager18AudioDeviceManager
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb24d2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 145
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93200 _TtC15XJSpeechManager18AudioDeviceManager
+              baseMethods 0xb2330 (struct method_list_t *)
+		   entsize 24
+		     count 17
+		      name 0x95210 isAutomaticAudioSessionRecoveryEnabled
+		     types 0x925d1 B16@0:8
+		       imp 0x185e0 
+		      name 0x95cf9 setIsAutomaticAudioSessionRecoveryEnabled:
+		     types 0x92582 v20@0:8B16
+		       imp 0x18664 
+		      name 0x94c50 currentRoute
+		     types 0x92714 q16@0:8
+		       imp 0x18740 
+		      name 0x95c21 setCurrentRoute:
+		     types 0x9258d v24@0:8q16
+		       imp 0x187c4 
+		      name 0x95260 isDeviceConnected
+		     types 0x925d1 B16@0:8
+		       imp 0x18814 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x18a44 
+		      name 0x946e9 audioRouteChanged:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x1a0ac 
+		      name 0x9413c handleAudioSessionInterruption:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x1ace8 
+		      name 0x94fcc handleAppDidEnterBackground
+		     types 0x92ee8 v16@0:8
+		       imp 0x1b530 
+		      name 0x94fa8 handleAppDidBecomeActive
+		     types 0x92ee8 v16@0:8
+		       imp 0x1b820 
+		      name 0x95fe1 syncAudioSessionAndBluetoothRoute
+		     types 0x92ee8 v16@0:8
+		       imp 0x1b864 
+		      name 0x95843 refreshAudioRouteAndReturnError:
+		     types 0x925f7 B24@0:8^@16
+		       imp 0x1bfbc 
+		      name 0x94a04 configureAudioRoute:error:
+		     types 0x9262b B32@0:8q16^@24
+		       imp 0x1c41c 
+		      name 0x94e0f discoverDevice
+		     types 0x92ee8 v16@0:8
+		       imp 0x1c670 
+		      name 0x9529e isHeadphonesConnected
+		     types 0x925d1 B16@0:8
+		       imp 0x1c69c 
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x1c848 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x1c86c 
+            baseProtocols 0x0
+                    ivars 0xae648
+                    entsize 32
+                      count 5
+			   offset 0xb5600 8
+			     name 0x95210 isAutomaticAudioSessionRecoveryEnabled
+			     type 0x92625 B
+			alignment 0
+			     size 1
+			   offset 0xb5618 16
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb5608 32
+			     name 0x94c50 currentRoute
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb5610 40
+			     name 0x94c00 currentLocalDevice
+			     type 0x92eb0 
+			alignment 3
+			     size 49
+			   offset 0xb5620 96
+			     name 0x93b83 lastLocalDevice
+			     type 0x92eb0 
+			alignment 3
+			     size 49
+           weakIvarLayout 0x0
+           baseProperties 0xae6f0
+                    entsize 16
+                      count 3
+			     name 0x95210 isAutomaticAudioSessionRecoveryEnabled
+			attributes 0x940c0 TB,N,VisAutomaticAudioSessionRecoveryEnabled
+			     name 0x94c50 currentRoute
+			attributes 0x93b30 Tq,N,VcurrentRoute
+			     name 0x95260 isDeviceConnected
+			attributes 0x93a62 TB,N,R
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xae600 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93200 _TtC15XJSpeechManager18AudioDeviceManager
+              baseMethods 0xb2310 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95e58 shared
+		     types 0x92ee0 @16@0:8
+		       imp 0x185a0 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0xae5e8
+                    entsize 16
+                      count 1
+			     name 0x95e58 shared
+			attributes 0x94070 T@"_TtC15XJSpeechManager18AudioDeviceManager",N,R
+00000000000ad7b0 0xb2768
+           isa 0xb5710
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb270a (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 32
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93230 _TtC15XJSpeechManager11HTTPClients
+              baseMethods 0xb26d0 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x20e40 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x20ef4 
+            baseProtocols 0x0
+                    ivars 0xae770
+                    entsize 32
+                      count 3
+			   offset 0xb56f8 8
+			     name 0x954d6 messager
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5700 16
+			     name 0x9547c logger
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5708 24
+			     name 0x93990 $__lazy_storage_$_session
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xae728 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93230 _TtC15XJSpeechManager11HTTPClients
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7b8 0xb28b0 _OBJC_CLASS_$__TtC15XJSpeechManager22NetworkSessionDelegate
+           isa 0xb58b8 _OBJC_METACLASS_$__TtC15XJSpeechManager22NetworkSessionDelegate
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb2852 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93260 _TtC15XJSpeechManager22NetworkSessionDelegate
+              baseMethods 0xb2818 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x253e4 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x2548c 
+            baseProtocols 0xae890
+                      count 1
+		      list[0] 0xae7d8 (struct protocol_t *)
+			      isa 0x0
+			     name 0x93290 NSURLSessionDelegate
+			protocols 0xae988
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb2920
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0xae8a0
+                    entsize 32
+                      count 4
+			   offset 0xb5880 8
+			     name 0x95750 pinnedCertificates
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5888 16
+			     name 0x96120 validateHostName
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb5890 17
+			     name 0x93f10 allowSelfSignedCertificates
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb5898 24
+			     name 0x94bb0 credentialProvider
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xae848 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93260 _TtC15XJSpeechManager22NetworkSessionDelegate
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0xae838
+                      count 1
+		      list[0] 0xae7d8 (struct protocol_t *)
+			      isa 0x0
+			     name 0x93290 NSURLSessionDelegate
+			protocols 0xae988
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb2920
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7c0 0xb59c0
+           isa 0xb5968
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb2c52 (struct class_ro_t *) Swift class
+                    flags 0xc0
+            instanceStart 16
+             instanceSize 136
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x932b0 _TtC15XJSpeechManager13LogFileHandle
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaeb30
+                    entsize 32
+                      count 18
+			   offset 0x88730 16
+			     name 0x94ec0 fileAESKey
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x88738 32
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb58e8 0
+			     name 0x94c20 currentLogFileURL
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb58f0 0
+			     name 0x954b2 maxFileSize
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb58f8 0
+			     name 0x93f30 $__lazy_storage_$_cachedLogsDirectory
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb5900 0
+			     name 0x96080 timestampFormatter
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5908 0
+			     name 0x94f00 fileNameFormatter
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5910 0
+			     name 0x94850 cachedFileHandle
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5918 0
+			     name 0x93a71 currentFileSize
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5920 0
+			     name 0x94be0 currentFileCreationDate
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb5928 0
+			     name 0x94870 cachedTodayStart
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb5930 0
+			     name 0x95440 lastTodayStartRefresh
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb5938 0
+			     name 0x96246 writeCount
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5940 0
+			     name 0x94931 cleanupEveryN
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5948 0
+			     name 0x9600f syncEveryN
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5950 0
+			     name 0x961fa writeBuffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb5958 0
+			     name 0x96210 writeBufferFlushCount
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb5960 0
+			     name 0x96230 writeBufferMaxBytes
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaeae8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x932b0 _TtC15XJSpeechManager13LogFileHandle
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7c8 0xb2d38 _OBJC_CLASS_$__TtC15XJSpeechManager6Logger
+           isa 0xb5db0 _OBJC_METACLASS_$__TtC15XJSpeechManager6Logger
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb2cda (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 16
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x932e0 _TtC15XJSpeechManager6Logger
+              baseMethods 0xb2ca0 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x2d420 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x2dd90 
+            baseProtocols 0x0
+                    ivars 0xaedc0
+                    entsize 32
+                      count 1
+			   offset 0xb5da0 8
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaed78 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x932e0 _TtC15XJSpeechManager6Logger
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7d0 0xb2ef8 _OBJC_CLASS_$__TtC15XJSpeechManager16LanguageResponse
+           isa 0xb5fb8 _OBJC_METACLASS_$__TtC15XJSpeechManager16LanguageResponse
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb2e9a (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 112
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93300 _TtC15XJSpeechManager16LanguageResponse
+              baseMethods 0xb2db8 (struct method_list_t *)
+		   entsize 24
+		     count 9
+		      name 0x953ed languageCode
+		     types 0x92ee0 @16@0:8
+		       imp 0x324d8 
+		      name 0x95d6a setLanguageCode:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x32594 
+		      name 0x95408 languageName
+		     types 0x92ee0 @16@0:8
+		       imp 0x32700 
+		      name 0x95d88 setLanguageName:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x32718 
+		      name 0x96169 voiceName
+		     types 0x92ee0 @16@0:8
+		       imp 0x32770 
+		      name 0x95e23 setVoiceName:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x3284c 
+		      name 0x94da0 description
+		     types 0x92ee0 @16@0:8
+		       imp 0x3361c 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x33a30 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x33a8c 
+            baseProtocols 0x0
+                    ivars 0xaee30
+                    entsize 32
+                      count 9
+			   offset 0xb5f60 8
+			     name 0x953ed languageCode
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5f68 24
+			     name 0x95408 languageName
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5f80 40
+			     name 0x93fe5 asr
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb5f88 41
+			     name 0x93ed9 tts
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb5f90 48
+			     name 0x9463d asrKey
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb5f98 64
+			     name 0x960b4 ttsKey
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb5f70 80
+			     name 0x96169 voiceName
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+			   offset 0xb5fa0 96
+			     name 0x95255 isDefault
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb5fa8 104
+			     name 0x95ebf sort
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0xaef58
+                    entsize 16
+                      count 4
+			     name 0x953ed languageCode
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x95408 languageName
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x96169 voiceName
+			attributes 0x93ff0 T@"NSString",N,C
+			     name 0x94da0 description
+			attributes 0x93a00 T@"NSString",N,R
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaede8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93300 _TtC15XJSpeechManager16LanguageResponse
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7d8 0xb3118 _OBJC_CLASS_$__TtC15XJSpeechManager13DebugDetector
+           isa 0xb66a0 _OBJC_METACLASS_$__TtC15XJSpeechManager13DebugDetector
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb30ba (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93330 _TtC15XJSpeechManager13DebugDetector
+              baseMethods 0xb3098 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x3b7bc 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaefa0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93330 _TtC15XJSpeechManager13DebugDetector
+              baseMethods 0xb3078 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x93ae7 isBeingDebugged
+		     types 0x925d1 B16@0:8
+		       imp 0x3b72c 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7e0 0xb3220 _OBJC_CLASS_$__TtC15XJSpeechManager17InjectionDetector
+           isa 0xb66d0 _OBJC_METACLASS_$__TtC15XJSpeechManager17InjectionDetector
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb31c2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93360 _TtC15XJSpeechManager17InjectionDetector
+              baseMethods 0xb3188 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x3c228 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x3c294 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaefe8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93360 _TtC15XJSpeechManager17InjectionDetector
+              baseMethods 0xb3168 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x952ce isInjected
+		     types 0x925d1 B16@0:8
+		       imp 0x3b9d4 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7e8 0xb3310 _OBJC_CLASS_$__TtC15XJSpeechManager17JailbreakDetector
+           isa 0xb6860 _OBJC_METACLASS_$__TtC15XJSpeechManager17JailbreakDetector
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb32b2 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93390 _TtC15XJSpeechManager17JailbreakDetector
+              baseMethods 0xb3290 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x3e2dc 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf030 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93390 _TtC15XJSpeechManager17JailbreakDetector
+              baseMethods 0xb3270 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x952d9 isJailbroken
+		     types 0x925d1 B16@0:8
+		       imp 0x3e274 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7f0 0xb3430 _OBJC_CLASS_$__TtC15XJSpeechManager13ProxyDetector
+           isa 0xb6b00 _OBJC_METACLASS_$__TtC15XJSpeechManager13ProxyDetector
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb33d2 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x933c0 _TtC15XJSpeechManager13ProxyDetector
+              baseMethods 0xb33b0 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x3e940 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf078 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x933c0 _TtC15XJSpeechManager13ProxyDetector
+              baseMethods 0xb3360 (struct method_list_t *)
+		   entsize 24
+		     count 3
+		      name 0x95342 isProxyEnabled
+		     types 0x925d1 B16@0:8
+		       imp 0x3e8c0 
+		      name 0x95283 isExternalProxyEnabled
+		     types 0x925d1 B16@0:8
+		       imp 0x3e8dc 
+		      name 0x953c2 isVPNTunnelActive
+		     types 0x925d1 B16@0:8
+		       imp 0x3e8f8 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad7f8 0xb3538 _OBJC_CLASS_$__TtC15XJSpeechManager17TamperingDetector
+           isa 0xb6b88 _OBJC_METACLASS_$__TtC15XJSpeechManager17TamperingDetector
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb34da (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x933f0 _TtC15XJSpeechManager17TamperingDetector
+              baseMethods 0xb34b8 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x3f98c 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf0c0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x933f0 _TtC15XJSpeechManager17TamperingDetector
+              baseMethods 0xb3480 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95392 isTampered
+		     types 0x925d1 B16@0:8
+		       imp 0x3f690 
+		      name 0x9539d isTamperedWithExpectedTeamID:
+		     types 0x92e38 B24@0:8@16
+		       imp 0x3f858 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad800 0xb3620
+           isa 0xb6bc8
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb35c2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93420 _TtC15XJSpeechManager21AIAudioDeviceServices
+              baseMethods 0xb3588 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x4051c 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x40aa0 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf108 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93420 _TtC15XJSpeechManager21AIAudioDeviceServices
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad808 0xb3720
+           isa 0xb6c08
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb36c2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93450 _TtC15XJSpeechManager22AIAuthenticateServcies
+              baseMethods 0xb3688 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x40b08 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x4169c 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf150 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93450 _TtC15XJSpeechManager22AIAuthenticateServcies
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad810 0xb3810
+           isa 0xb6c58
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb37b2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93480 _TtC15XJSpeechManager14AIBaseServices
+              baseMethods 0xb3778 (struct method_list_t *)
+		   entsize 24
+		     count 2
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x42314 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x42adc 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf198 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93480 _TtC15XJSpeechManager14AIBaseServices
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad818 0xb3918
+           isa 0xb6ca8
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb38ba (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 64
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x934b0 _TtC15XJSpeechManager19AIHeartBeatServices
+              baseMethods 0xb3868 (struct method_list_t *)
+		   entsize 24
+		     count 3
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x42b54 
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x42c14 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x42c80 
+            baseProtocols 0x0
+                    ivars 0xaf228
+                    entsize 32
+                      count 4
+			   offset 0xb6c88 8
+			     name 0x95792 pollingTimer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb6c90 16
+			     name 0x95ed9 speechId
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb6c98 32
+			     name 0x94db8 deviceId
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb6ca0 48
+			     name 0x94624 area
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf1e0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x934b0 _TtC15XJSpeechManager19AIHeartBeatServices
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad820 0xb3a90
+           isa 0xb6de0
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb3a32 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 8
+             instanceSize 8
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x934e0 _TtC15XJSpeechManager11CryptoUtils
+              baseMethods 0xb3a10 (struct method_list_t *)
+		   entsize 24
+		     count 1
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x47e78 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf2b0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x934e0 _TtC15XJSpeechManager11CryptoUtils
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad828 0xb6ef8
+           isa 0xb6eb8
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf3ea (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 50
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93510 _TtC15XJSpeechManager13WSCompression
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaf340
+                    entsize 32
+                      count 5
+			   offset 0x8a328 16
+			     name 0x95010 headerWSExtensionName
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a330 32
+			     name 0x94cd6 decompressor
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a338 40
+			     name 0x949d3 compressor
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a340 48
+			     name 0x94cf0 decompressorTakeOver
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8a348 49
+			     name 0x949e0 compressorTakeOver
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf2f8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93510 _TtC15XJSpeechManager13WSCompression
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad830 0xb7030
+           isa 0xb6ff0
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf502 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 152
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93540 _TtC15XJSpeechManager12Decompressor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaf478
+                    entsize 32
+                      count 4
+			   offset 0x8a370 16
+			     name 0x95fc3 strm
+			     type 0x92eb0 
+			alignment 3
+			     size 112
+			   offset 0x8a378 128
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a380 136
+			     name 0x95060 inflateInitialized
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8a388 144
+			     name 0x961c3 windowBits
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf430 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93540 _TtC15XJSpeechManager12Decompressor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad838 0xb7160
+           isa 0xb7120
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf61a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 152
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93570 _TtC15XJSpeechManager10Compressor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaf590
+                    entsize 32
+                      count 4
+			   offset 0x8a3a0 16
+			     name 0x95fc3 strm
+			     type 0x92eb0 
+			alignment 3
+			     size 112
+			   offset 0x8a3a8 128
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a3b0 136
+			     name 0x94d70 deflateInitialized
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8a3b8 144
+			     name 0x961c3 windowBits
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf548 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93570 _TtC15XJSpeechManager10Compressor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad840 0xb3bc0 _OBJC_CLASS_$__TtC15XJSpeechManager12NativeEngine
+           isa 0xb7268 _OBJC_METACLASS_$__TtC15XJSpeechManager12NativeEngine
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb3b62 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 32
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x935a0 _TtC15XJSpeechManager12NativeEngine
+              baseMethods 0xb3ae0 (struct method_list_t *)
+		   entsize 24
+		     count 5
+		      name 0x93e3d URLSession:webSocketTask:didOpenWithProtocol:
+		     types 0x924c0 v40@0:8@16@24@32
+		       imp 0x4c524 
+		      name 0x9448b URLSession:webSocketTask:didCloseWithCode:reason:
+		     types 0x92800 v48@0:8@16@24q32@40
+		       imp 0x4c5d4 
+		      name 0x942dd URLSession:task:didCompleteWithError:
+		     types 0x924c0 v40@0:8@16@24@32
+		       imp 0x4c720 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x4c828 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x4c8b8 
+            baseProtocols 0xaf780
+                      count 2
+		      list[0] 0xaf660 (struct protocol_t *)
+			      isa 0x0
+			     name 0x935d0 NSURLSessionDataDelegate
+			protocols 0xaf840
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb3ca8
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+		      list[1] 0xaf6c0 (struct protocol_t *)
+			      isa 0x0
+			     name 0x935f0 NSURLSessionWebSocketDelegate
+			protocols 0xaf8a0
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb3da0
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0xaf798
+                    entsize 32
+                      count 2
+			   offset 0xb7260 8
+			     name 0x96041 task
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb7258 16
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf738 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x935a0 _TtC15XJSpeechManager12NativeEngine
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0xaf720
+                      count 2
+		      list[0] 0xaf660 (struct protocol_t *)
+			      isa 0x0
+			     name 0x935d0 NSURLSessionDataDelegate
+			protocols 0xaf840
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb3ca8
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+		      list[1] 0xaf6c0 (struct protocol_t *)
+			      isa 0x0
+			     name 0x935f0 NSURLSessionWebSocketDelegate
+			protocols 0xaf8a0
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb3da0
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad848 0xb7340
+           isa 0xb72e8
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb4022 (struct class_ro_t *) Swift class
+                    flags 0xc0
+            instanceStart 16
+             instanceSize 257
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93630 _TtC15XJSpeechManager8WSEngine
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaf9d8
+                    entsize 32
+                      count 16
+			   offset 0x8a4d8 16
+			     name 0x960a0 transport
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a4e0 32
+			     name 0x94f6a framer
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0x8a4e8 72
+			     name 0x95051 httpHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0x8a4f0 112
+			     name 0x949c0 compressionHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0x8a4f8 152
+			     name 0x948b2 certPinner
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a500 168
+			     name 0x94ffe headerChecker
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb72b8 0
+			     name 0x9435c request
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xb72c0 0
+			     name 0x94f54 frameHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb72d0 0
+			     name 0x94de1 didUpgrade
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb72d8 0
+			     name 0x95a8c secKeyValue
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb72c8 0
+			     name 0x96268 writeQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb72a0 0
+			     name 0x954f3 mutex
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb72b0 0
+			     name 0x93a59 canSend
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb72a8 0
+			     name 0x95241 isConnecting
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xc0588 0
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xc0580 92738097012575
+			     name 0x959e0 respondToPingWithPong
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaf990 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93630 _TtC15XJSpeechManager8WSEngine
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad850 0xb7598
+           isa 0xb7558
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafc72 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 48
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93650 _TtC15XJSpeechManager21FoundationHTTPHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xafc28
+                    entsize 32
+                      count 2
+			   offset 0x8a5e0 16
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a5e8 32
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafbe0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93650 _TtC15XJSpeechManager21FoundationHTTPHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad858 0xb76d0
+           isa 0xb7690
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafd6a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 56
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93680 _TtC15XJSpeechManager27FoundationHTTPServerHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xafd00
+                    entsize 32
+                      count 3
+			   offset 0x8a630 16
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a638 32
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a640 48
+			     name 0x93acf getVerb
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafcb8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93680 _TtC15XJSpeechManager27FoundationHTTPServerHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad860 0xb77d8
+           isa 0xb7798
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafea2 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 58
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x936c0 _TtC15XJSpeechManager14FrameCollector
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xafdf8
+                    entsize 32
+                      count 5
+			   offset 0x8a698 16
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a6a0 32
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a6a8 48
+			     name 0x94f40 frameCount
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a6b0 56
+			     name 0x953bb isText
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8a6b8 57
+			     name 0x95500 needsDecompression
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafdb0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x936c0 _TtC15XJSpeechManager14FrameCollector
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad868 0xb7948
+           isa 0xb7908
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xaffda (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 58
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x936f0 _TtC15XJSpeechManager8WSFramer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xaff30
+                    entsize 32
+                      count 5
+			   offset 0x8a940 16
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8a948 24
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a950 40
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8a958 56
+			     name 0x949a0 compressionEnabled
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8a960 57
+			     name 0x95383 isServer
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xafee8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x936f0 _TtC15XJSpeechManager8WSFramer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad870 0xb7ad8
+           isa 0xb7a98
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb00b2 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 48
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93710 _TtC15XJSpeechManager17StringHTTPHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb0068
+                    entsize 32
+                      count 2
+			   offset 0x8aab0 16
+			     name 0x947d8 buffer
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8aab8 32
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0020 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93710 _TtC15XJSpeechManager17StringHTTPHandler
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad878 0xb7c10
+           isa 0xb7bd0
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb016a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 17
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93740 _TtC15XJSpeechManager18FoundationSecurity
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb0140
+                    entsize 32
+                      count 1
+			   offset 0x8abe0 16
+			     name 0x939c8 allowSelfSigned
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb00f8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93740 _TtC15XJSpeechManager18FoundationSecurity
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad880 0xb7cf8
+           isa 0xb7cb8
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0282 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 56
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93770 _TtC15XJSpeechManager15WebSocketServer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb01f8
+                    entsize 32
+                      count 4
+			   offset 0x8ae68 16
+			     name 0x93c09 onEvent
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8ae70 32
+			     name 0x94a98 connections
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8ae78 40
+			     name 0x95456 listener
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8ae80 48
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb01b0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93770 _TtC15XJSpeechManager15WebSocketServer
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad888 0xb7e08
+           isa 0xb7dc8
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb041a (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 104
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937a0 _TtC15XJSpeechManager16ServerConnection
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb0310
+                    entsize 32
+                      count 8
+			   offset 0x8aea8 16
+			     name 0x960a0 transport
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8aeb0 24
+			     name 0x95051 httpHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8aeb8 32
+			     name 0x94f6a framer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8aec0 40
+			     name 0x94f54 frameHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8aec8 48
+			     name 0x94de1 didUpgrade
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8aed0 56
+			     name 0x93c09 onEvent
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8aed8 72
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8aee0 88
+			     name 0x9505d id
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb02c8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937a0 _TtC15XJSpeechManager16ServerConnection
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad890 0xb7f98
+           isa 0xb7f48
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb4072 (struct class_ro_t *) Swift class
+                    flags 0xc0
+            instanceStart 16
+             instanceSize 96
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937d0 _TtC15XJSpeechManager9WebSocket
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb04a8
+                    entsize 32
+                      count 5
+			   offset 0x8b0d8 16
+			     name 0x94e50 engine
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0x8b0e0 56
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8b0e8 72
+			     name 0x93c09 onEvent
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xc0598 671744
+			     name 0x9435c request
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xc05a0 0
+			     name 0x94881 callbackQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0460 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937d0 _TtC15XJSpeechManager9WebSocket
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad898 0xb4188 _OBJC_CLASS_$__TtC15XJSpeechManager19FoundationTransport
+           isa 0xb8138 _OBJC_METACLASS_$__TtC15XJSpeechManager19FoundationTransport
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb412a (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 96
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937f0 _TtC15XJSpeechManager19FoundationTransport
+              baseMethods 0xb40c0 (struct method_list_t *)
+		   entsize 24
+		     count 4
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x5d830 
+		      name 0x95f7d stream:handleEvent:
+		     types 0x92e0e v32@0:8@16Q24
+		       imp 0x5ed90 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x5ee2c 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x5d854 
+            baseProtocols 0xb0608
+                      count 1
+		      list[0] 0xb0550 (struct protocol_t *)
+			      isa 0x0
+			     name 0x93820 NSStreamDelegate
+			protocols 0xb0720
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb4308
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0xb0618
+                    entsize 32
+                      count 8
+			   offset 0xb80e8 8
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb80f0 24
+			     name 0x961d8 workQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb80f8 32
+			     name 0x951d2 inputStream
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8100 40
+			     name 0x9567e outputStream
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8108 48
+			     name 0x9532b isOpen
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb8110 56
+			     name 0x95532 onConnect
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb80e0 72
+			     name 0x9538c isTLS
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb8118 80
+			     name 0x948b2 certPinner
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb05c0 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x937f0 _TtC15XJSpeechManager19FoundationTransport
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0xb05b0
+                      count 1
+		      list[0] 0xb0550 (struct protocol_t *)
+			      isa 0x0
+			     name 0x93820 NSStreamDelegate
+			protocols 0xb0720
+		  instanceMethods 0x0 (struct method_list_t *)
+		     classMethods 0x0 (struct method_list_t *)
+	  optionalInstanceMethods 0xb4308
+	     optionalClassMethods 0x0
+	       instanceProperties 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8a0 0xb81c0
+           isa 0xb8180
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0832 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 50
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93840 _TtC15XJSpeechManager12TCPTransport
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb0788
+                    entsize 32
+                      count 5
+			   offset 0x8b398 16
+			     name 0x94a66 connection
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8b3a0 24
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8b3a8 32
+			     name 0x94d90 delegate
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0x8b3b0 48
+			     name 0x9536f isRunning
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0x8b3b8 49
+			     name 0x9538c isTLS
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0740 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93840 _TtC15XJSpeechManager12TCPTransport
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8a8 0xb8340
+           isa 0xb8300
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb08c2 (struct class_ro_t *) Swift class
+                    flags 0x80
+            instanceStart 16
+             instanceSize 16
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93870 _TtC15XJSpeechManager12MessageCoder
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0878 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93870 _TtC15XJSpeechManager12MessageCoder
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8b0 0xb8418
+           isa 0xb83c8
+    superclass 0x0 _OBJC_CLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb4342 (struct class_ro_t *) Swift class
+                    flags 0xc0
+            instanceStart 16
+             instanceSize 48
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x938a0 _TtC15XJSpeechManager14NetworkMonitor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0xb0950
+                    entsize 32
+                      count 5
+			   offset 0x8b490 16
+			     name 0x93bbd monitor
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0x8b498 24
+			     name 0x957e0 queue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xc05a8 671744
+			     name 0x95427 lastStatus
+			     type 0x92eb0 
+			alignment 0
+			     size 0
+			   offset 0xc05b8 22
+			     name 0x96108 updateRate
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xc05b0 21474836485
+			     name 0x96046 timer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$__TtCs12_SwiftObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0908 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x938a0 _TtC15XJSpeechManager14NetworkMonitor
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8b8 0xb4440 _OBJC_CLASS_$__TtC15XJSpeechManager17XJWebSocketClient
+           isa 0xb8508 _OBJC_METACLASS_$__TtC15XJSpeechManager17XJWebSocketClient
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb43e2 (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 136
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x938d0 _TtC15XJSpeechManager17XJWebSocketClient
+              baseMethods 0xb4390 (struct method_list_t *)
+		   entsize 24
+		     count 3
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x62d98 
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x65144 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x65168 
+            baseProtocols 0x0
+                    ivars 0xb0a40
+                    entsize 32
+                      count 10
+			   offset 0xb84c8 8
+			     name 0x94a80 connectionStatusHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb84d0 24
+			     name 0x961a8 websocketQueue
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb84d8 32
+			     name 0x954c7 messageHandler
+			     type 0x92eb0 
+			alignment 3
+			     size 16
+			   offset 0xb84e0 48
+			     name 0x94986 closedByManual
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb84e8 56
+			     name 0x94a58 connectStatus
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb84f0 64
+			     name 0x94df0 disconnectInterval
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb84f8 72
+			     name 0x94113 elapsedInterval
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb84b8 80
+			     name 0x96046 timer
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8500 88
+			     name 0x949f9 config
+			     type 0x92eb0 
+			alignment 3
+			     size 40
+			   offset 0xb84c0 128
+			     name 0x95eb0 socket
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+           weakIvarLayout 0x0
+           baseProperties 0x0
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb09f8 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x938d0 _TtC15XJSpeechManager17XJWebSocketClient
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8c0 0xb4718 _OBJC_CLASS_$__TtC15XJSpeechManager7XJError
+           isa 0xb8708 _OBJC_METACLASS_$__TtC15XJSpeechManager7XJError
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb46ba (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 32
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93900 _TtC15XJSpeechManager7XJError
+              baseMethods 0xb4620 (struct method_list_t *)
+		   entsize 24
+		     count 6
+		      name 0x9499a code
+		     types 0x92714 q16@0:8
+		       imp 0x6b338 
+		      name 0x94212 message
+		     types 0x92ee0 @16@0:8
+		       imp 0x6b358 
+		      name 0x950da initWithCode:message:
+		     types 0x92ef0 @32@0:8q16@24
+		       imp 0x6b494 
+		      name 0x94da0 description
+		     types 0x92ee0 @16@0:8
+		       imp 0x6b4f8 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x6b640 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x6b69c 
+            baseProtocols 0x0
+                    ivars 0xb0bd0
+                    entsize 32
+                      count 2
+			   offset 0xb86e8 8
+			     name 0x9499a code
+			     type 0x92629 q
+			alignment 3
+			     size 8
+			   offset 0xb86f0 16
+			     name 0x94212 message
+			     type 0x92627 ?
+			alignment 3
+			     size 16
+           weakIvarLayout 0x0
+           baseProperties 0xb0c18
+                    entsize 16
+                      count 3
+			     name 0x9499a code
+			attributes 0x94167 Tq,N,R,Vcode
+			     name 0x94212 message
+			attributes 0x93a00 T@"NSString",N,R
+			     name 0x94da0 description
+			attributes 0x93a00 T@"NSString",N,R
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0b88 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93900 _TtC15XJSpeechManager7XJError
+              baseMethods 0x0 (struct method_list_t *)
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0x0
+00000000000ad8c8 0xb4ad8 _OBJC_CLASS_$__TtC15XJSpeechManager16XJSpeechsManager
+           isa 0xb8850 _OBJC_METACLASS_$__TtC15XJSpeechManager16XJSpeechsManager
+    superclass 0x0 _OBJC_CLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb4a7a (struct class_ro_t *) Swift class
+                    flags 0x184 RO_HAS_CXX_STRUCTORS
+            instanceStart 8
+             instanceSize 123
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93920 _TtC15XJSpeechManager16XJSpeechsManager
+              baseMethods 0xb47e8 (struct method_list_t *)
+		   entsize 24
+		     count 27
+		      name 0x95eca sourceLanguage
+		     types 0x92ee0 @16@0:8
+		       imp 0x70794 
+		      name 0x95de4 setSourceLanguage:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x70828 
+		      name 0x96027 targetLanguage
+		     types 0x92ee0 @16@0:8
+		       imp 0x708c8 
+		      name 0x95e06 setTargetLanguage:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x7095c 
+		      name 0x94bca currentDevice
+		     types 0x92ee0 @16@0:8
+		       imp 0x709fc 
+		      name 0x95c07 setCurrentDevice:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x70a90 
+		      name 0x95260 isDeviceConnected
+		     types 0x925d1 B16@0:8
+		       imp 0x70bf0 
+		      name 0x95d2b setIsDeviceConnected:
+		     types 0x92582 v20@0:8B16
+		       imp 0x70c74 
+		      name 0x94a58 connectStatus
+		     types 0x92714 q16@0:8
+		       imp 0x71064 
+		      name 0x9588f registerListenerWithLanguage:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x71e9c 
+		      name 0x958ad registerListenerWithRecorder:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x72144 
+		      name 0x9586b registerListenerWithDevice:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x72418 
+		      name 0x958d7 registerListenerWithService:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x726c0 
+		      name 0x94f94 getLanguage
+		     types 0x92ee8 v16@0:8
+		       imp 0x75c18 
+		      name 0x95f30 startSessionWithFunctionEnum:sourceLanguage:targetLanguage:
+		     types 0x92f00 B40@0:8q16@24@32
+		       imp 0x78ad0 
+		      name 0x948cc changeLanuagesWithSource:target:
+		     types 0x92f11 B32@0:8@16@24
+		       imp 0x79154 
+		      name 0x95efd startSessionWithFunctionEnum:sourceLanguage:
+		     types 0x92f1f B32@0:8q16@24
+		       imp 0x791d4 
+		      name 0x94eaa feedAudioData:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x79c54 
+		      name 0x94e39 endSessionWithActive:
+		     types 0x92582 v20@0:8B16
+		       imp 0x79fd4 
+		      name 0x94e1f endSession
+		     types 0x92ee8 v16@0:8
+		       imp 0x7a00c 
+		      name 0x960fa uninit
+		     types 0x92ee8 v16@0:8
+		       imp 0x7a6a4 
+		      name 0x94901 checkDeviceOnSuccess:onError:
+		     types 0x92f2d v32@0:8@?16@?24
+		       imp 0x7a6d8 
+		      name 0x9476f bindDeviceOnSuccess:onError:
+		     types 0x92f2d v32@0:8@?16@?24
+		       imp 0x7a928 
+		      name 0x960cc unbindDeviceOnSuccess:onError:
+		     types 0x92f2d v32@0:8@?16@?24
+		       imp 0x7ab84 
+		      name 0x940f0 dealloc
+		     types 0x92ee8 v16@0:8
+		       imp 0x7af80 
+		      name 0x95090 init
+		     types 0x92ee0 @16@0:8
+		       imp 0x7b06c 
+		      name 0x93fa0 .cxx_destruct
+		     types 0x92ee8 v16@0:8
+		       imp 0x7afa4 
+            baseProtocols 0x0
+                    ivars 0xb0cc0
+                    entsize 32
+                      count 17
+			   offset 0xb8840 8
+			     name 0x9613e viewController
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8820 16
+			     name 0x94f7d functionType
+			     type 0x92eb0 
+			alignment 3
+			     size 9
+			   offset 0xb87d0 32
+			     name 0x95eca sourceLanguage
+			     type 0x92f40 @"_TtC15XJSpeechManager16LanguageResponse"
+			alignment 3
+			     size 8
+			   offset 0xb87d8 40
+			     name 0x96027 targetLanguage
+			     type 0x92f40 @"_TtC15XJSpeechManager16LanguageResponse"
+			alignment 3
+			     size 8
+			   offset 0xb87f8 48
+			     name 0x941c8 lanuageListener
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8800 56
+			     name 0x957e8 recordListener
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8808 64
+			     name 0x93ab7 deviceListenner
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8810 72
+			     name 0x95ad0 serviceConncetionListener
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb87e0 80
+			     name 0x94bca currentDevice
+			     type 0x92f70 @"_TtC15XJSpeechManager12DeviceEntity"
+			alignment 3
+			     size 8
+			   offset 0xb87e8 88
+			     name 0x95260 isDeviceConnected
+			     type 0x92625 B
+			alignment 0
+			     size 1
+			   offset 0xb8818 89
+			     name 0x95522 netStatus
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb87f0 96
+			     name 0x9617c webSocket
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb87c8 104
+			     name 0x93ef6 websocketConfig
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8848 112
+			     name 0x954d6 messager
+			     type 0x92eb0 
+			alignment 3
+			     size 8
+			   offset 0xb8828 120
+			     name 0x94970 closeSessionByManual
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb8838 121
+			     name 0x951e0 insufficientVIPDuration
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+			   offset 0xb8830 122
+			     name 0x93fc0 RTSServiceInitialized
+			     type 0x92eb0 
+			alignment 0
+			     size 1
+           weakIvarLayout 0x0
+           baseProperties 0xb0ee8
+                    entsize 16
+                      count 5
+			     name 0x95eca sourceLanguage
+			attributes 0x93950 T@"_TtC15XJSpeechManager16LanguageResponse",N,&,VsourceLanguage
+			     name 0x96027 targetLanguage
+			attributes 0x93f60 T@"_TtC15XJSpeechManager16LanguageResponse",N,&,VtargetLanguage
+			     name 0x94bca currentDevice
+			attributes 0x94020 T@"_TtC15XJSpeechManager12DeviceEntity",N,&,VcurrentDevice
+			     name 0x95260 isDeviceConnected
+			attributes 0x93a90 TB,N,VisDeviceConnected
+			     name 0x94a58 connectStatus
+			attributes 0x93ae0 Tq,N,R
+Meta Class
+           isa 0x0
+    superclass 0x0 _OBJC_METACLASS_$_NSObject
+         cache 0x0
+        vtable 0x0
+          data 0xb0c78 (struct class_ro_t *)
+                    flags 0x81 RO_META
+            instanceStart 40
+             instanceSize 40
+                 reserved 0x0
+               ivarLayout 0x0
+                     name 0x93920 _TtC15XJSpeechManager16XJSpeechsManager
+              baseMethods 0xb4780 (struct method_list_t *)
+		   entsize 24
+		     count 4
+		      name 0x95e58 shared
+		     types 0x92ee0 @16@0:8
+		       imp 0x706f8 
+		      name 0x95dcf setShared:
+		     types 0x927d0 v24@0:8@16
+		       imp 0x70704 
+		      name 0x952c0 isInitialized
+		     types 0x925d1 B16@0:8
+		       imp 0x70734 
+		      name 0x95098 initSDKWithViewController:params:callBack:
+		     types 0x92640 v40@0:8@16@24@?32
+		       imp 0x7175c 
+            baseProtocols 0x0
+                    ivars 0x0
+           weakIvarLayout 0x0
+           baseProperties 0xb0c50
+                    entsize 16
+                      count 2
+			     name 0x95e58 shared
+			attributes 0x93a20 T@"_TtC15XJSpeechManager16XJSpeechsManager",N,&
+			     name 0x952c0 isInitialized
+			attributes 0x93a62 TB,N,R
+Contents of (__DATA,__objc_classrefs) section
+00000000000b13d0 0x0 _OBJC_CLASS_$_AVAudioEngine
+00000000000b13d8 0x0 _OBJC_CLASS_$_AVAudioPlayerNode
+00000000000b13e0 0x0 _OBJC_CLASS_$_OS_dispatch_queue
+00000000000b13e8 0x0 _OBJC_CLASS_$_AVAudioFormat
+00000000000b13f0 0x0 _OBJC_CLASS_$_AVAudioPCMBuffer
+00000000000b13f8 0x0 _OBJC_CLASS_$_AVAudioSession
+00000000000b1400 0x0 _OBJC_CLASS_$_NSError
+00000000000b1408 0x0 _OBJC_CLASS_$_NSLock
+00000000000b1410 0x0 _OBJC_CLASS_$_NSBundle
+00000000000b1418 0x0 _OBJC_CLASS_$_UIDevice
+00000000000b1420 0x0 _OBJC_CLASS_$_NSNotificationCenter
+00000000000b1428 0x0 _OBJC_CLASS_$_AVAudioSessionRouteDescription
+00000000000b1430 0x0 _OBJC_CLASS_$_AVAudioSessionPortDescription
+00000000000b1438 0x0 _OBJC_CLASS_$_UIApplication
+00000000000b1440 0x0 _OBJC_CLASS_$_UIScene
+00000000000b1448 0x0 _OBJC_CLASS_$_UIWindowScene
+00000000000b1450 0x0 _OBJC_CLASS_$_UIWindow
+00000000000b1458 0x0 _OBJC_CLASS_$_NSHTTPCookie
+00000000000b1460 0x0 _OBJC_CLASS_$_UINavigationController
+00000000000b1468 0x0 _OBJC_CLASS_$_UITabBarController
+00000000000b1470 0x0 _OBJC_CLASS_$_NSOperationQueue
+00000000000b1478 0x0 _OBJC_CLASS_$_NSURLSessionConfiguration
+00000000000b1480 0x0 _OBJC_CLASS_$_NSURLSession
+00000000000b1488 0x0 _OBJC_CLASS_$_NSURLProtectionSpace
+00000000000b1490 0x0 _OBJC_CLASS_$_NSURLCredentialStorage
+00000000000b1498 0x0 _OBJC_CLASS_$_NSFileManager
+00000000000b14a0 0x0 _OBJC_CLASS_$_NSFileHandle
+00000000000b14a8 0x0 _OBJC_CLASS_$_NSISO8601DateFormatter
+00000000000b14b0 0x0 _OBJC_CLASS_$_NSDateFormatter
+00000000000b14b8 0x0 _OBJC_CLASS_$_NSProcessInfo
+00000000000b14c0 0x0 _OBJC_CLASS_$_NSDictionary
+00000000000b14c8 0x0 _OBJC_CLASS_$_NSHTTPCookieStorage
+00000000000b14d0 0x0 _OBJC_CLASS_$_NSString
+00000000000b14d8 0x0 _OBJC_CLASS_$_NSStream
+00000000000b14e0 0x0 _OBJC_CLASS_$_NSMutableData
+00000000000b14e8 0x0 _OBJC_CLASS_$_NSTimer
+00000000000b14f0 0x0 _OBJC_CLASS_$_NSRunLoop
+00000000000b14f8 0x0 _OBJC_CLASS_$_NSJSONSerialization
+00000000000b1500 0x0 _OBJC_CLASS_$_NSHTTPURLResponse
+Contents of (__DATA,__objc_protolist) section
+00000000000ad8d0 0xadac8
+00000000000ad8d8 0xadb28
+00000000000ad8e0 0xadb88
+00000000000ad8e8 0xadbe8
+00000000000ad8f0 0xadc48
+00000000000ad8f8 0xae7d8
+00000000000ad900 0xae928
+00000000000ad908 0xaf660
+00000000000ad910 0xaf6c0
+00000000000ad918 0xaf7e0
+00000000000ad920 0xb0550
+Contents of (__DATA,__objc_imageinfo) section
+  version 0
+    flags 0x6030740 OBJC_IMAGE_HAS_CATEGORY_CLASS_PROPERTIES Swift 5 or later

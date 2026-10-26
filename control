@@ -1,0 +1,9 @@
+Package: com.nanomuse.hejiabypass
+Name: HeJiaBypass
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: 移动爱家 (com.cmcc.zhihuiguanjia) 越狱/篡改/注入/调试/代理检测绕过
+Maintainer: nanoMuse
+Author: nanoMuse
+Section: Tweaks
+Depends: mobilesubstrate

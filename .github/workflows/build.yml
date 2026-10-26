@@ -1,0 +1,52 @@
+name: Build Tweak
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Compile HeJiaBypass
+    runs-on: macos-14
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Theos
+        run: |
+          export THEOS=${{ github.workspace }}/theos
+          git clone --recursive --depth 1 https://github.com/theos/theos.git "$THEOS"
+          # SDK：theos/sdks 仓库提供打包好的 iPhoneOS SDK
+          git clone --depth 1 https://github.com/theos/sdks.git "$THEOS/sdks"
+          ls "$THEOS/sdks" | head -20
+
+      - name: Build
+        run: |
+          export THEOS=${{ github.workspace }}/theos
+          make clean || true
+          make -j"$(sysctl -n hw.ncpu)" DEBUG=0 FINALPACKAGE=1
+
+      - name: Locate artifacts
+        run: |
+          find .theos -name '*.dylib' -o -name '*.deb' | head -20
+
+      - name: Upload dylib
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeJiaBypass-dylib
+          path: .theos/obj/**/*.dylib
+          if-no-files-found: warn
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: HeJiaBypass-deb
+          path: packages/*.deb
+          if-no-files-found: ignore
