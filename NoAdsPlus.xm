@@ -100,47 +100,6 @@ static void np_patch_mcs_popups(void) {
 }
 
 // ---------------------------------------------------------------------------
-// 3.5 设备页「场景 + 产品功能图册」卡片
-//     日志实测：首页出现 HYHardwareSceneAndBannerView / HYCommonHardwareSenceHalfViewBannerCell，
-//     即使 getBannerContentList 已被拦，这张卡仍由本地默认数据渲染 → 直接掐数据入口
-// ---------------------------------------------------------------------------
-// 注意：不能简单置空——这两个方法同时负责计算高度/约束，
-// 直接 return 会让视图停在未初始化状态，触发 Auto Layout 反复重算（表现为界面卡死）。
-// 正确做法是照常调用，只把数据换成空数组，让内部走“无数据”分支。
-static IMP np_orig_reloadBanner = NULL;
-static IMP np_orig_reloadAllBanner = NULL;
-
-static void np_reloadBanner(id self, SEL _cmd, id arg) {
-    typedef void (*fn_t)(id, SEL, id);
-    (void)arg;
-    if (np_orig_reloadBanner) ((fn_t)np_orig_reloadBanner)(self, _cmd, @[]);
-}
-
-static void np_reloadAllBanner(id self, SEL _cmd, id arg) {
-    typedef void (*fn_t)(id, SEL, id);
-    (void)arg;
-    if (np_orig_reloadAllBanner) ((fn_t)np_orig_reloadAllBanner)(self, _cmd, @[]);
-}
-
-static void np_patch_hardware_banner(void) {
-    Class c = objc_getClass("HYHardwareSceneAndBannerView");
-    if (!c) { NP_LOG(@"[MISS-CLASS] HYHardwareSceneAndBannerView"); return; }
-
-    Method m1 = class_getInstanceMethod(c, sel_registerName("reloadBanner:"));
-    if (m1) {
-        np_orig_reloadBanner = method_getImplementation(m1);
-        method_setImplementation(m1, (IMP)np_reloadBanner);
-        NP_LOG(@"[OK] -[HYHardwareSceneAndBannerView reloadBanner:] (空数组)");
-    }
-    Method m2 = class_getInstanceMethod(c, sel_registerName("reloadAllBanner:"));
-    if (m2) {
-        np_orig_reloadAllBanner = method_getImplementation(m2);
-        method_setImplementation(m2, (IMP)np_reloadAllBanner);
-        NP_LOG(@"[OK] -[HYHardwareSceneAndBannerView reloadAllBanner:] (空数组)");
-    }
-}
-
-// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -231,7 +190,6 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_launch_ad();
         np_patch_own_ads();
         np_patch_mcs_popups();
-        np_patch_hardware_banner();
         if (np_banner_on()) {
             np_patch_banners();
         } else {

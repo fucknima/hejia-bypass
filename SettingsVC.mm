@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <stdlib.h>
+#include <unistd.h>
 
 extern "C" void HTLog(const char *tag, NSString *msg);
 extern "C" const char *HTGetLogFilePath(void);
@@ -80,11 +81,9 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
                                         handler:^(UIAlertAction *act) {
         (void)act;
         SVC_LOG(@"用户触发强制退出");
-        // 留一点时间把日志刷到磁盘再杀
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)),
-                       dispatch_get_main_queue(), ^{
-            exit(0);
-        });
+        // 用 _exit：跳过 atexit / stdio 清理，避免被卡在退出处理里
+        // （日志每行都是 fopen/fputs/fclose，已经落盘，不需要额外 flush）
+        _exit(0);
     }]];
     [self presentViewController:a animated:YES completion:nil];
 }
