@@ -78,6 +78,7 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic) BOOL hidden;
 @property (nonatomic, strong) UIColor *backgroundColor;
 @property (nonatomic) CGFloat alpha;
+@property (nonatomic) NSInteger tag;
 @property (nonatomic) BOOL userInteractionEnabled;
 @property (nonatomic, readonly) BOOL isUserInteractionEnabled;
 - (void)addSubview:(UIView *)v;

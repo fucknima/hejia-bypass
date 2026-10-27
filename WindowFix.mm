@@ -22,43 +22,52 @@ extern "C" void HTLog(const char *tag, NSString *msg);
 
 extern "C" {
 
-static NSMutableArray *gDisabled = nil;   // 被我们关掉交互的 root view
+// 取窗口里真正显示的那个控制器的 view
+// （1999 窗口的 root 是 UINavigationController，空视图在 topViewController 里）
+static UIViewController *HTVisibleVC(UIWindow *w) {
+    UIViewController *vc = w.rootViewController;
+    if (!vc) return nil;
+    UIViewController *p = vc.presentedViewController;
+    while (p) { vc = p; p = vc.presentedViewController; }
 
-static BOOL HTIsOurDisabled(UIView *v) {
-    for (id o in gDisabled) if (o == v) return YES;
-    return NO;
+    Class navCls = objc_getClass("UINavigationController");
+    if (navCls && [vc isKindOfClass:navCls]) {
+        UIViewController *t = [(UINavigationController *)vc topViewController];
+        if (t) vc = t;
+    }
+    return vc;
 }
 
 static void HTScanWindows(void) {
-    if (!gDisabled) gDisabled = [NSMutableArray array];
-
     for (UIWindow *w in [UIApplication sharedApplication].windows) {
         @try {
             CGFloat lv = w.windowLevel;
             if (lv <= 0) continue;          // 主窗口不动
             if (lv >= 2000) continue;       // 系统 alert 层不动
-            if (w.hidden) continue;
 
-            UIView *root = w.rootViewController.view;
+            UIViewController *vc = HTVisibleVC(w);
+            UIView *root = vc ? vc.view : nil;
             if (!root) continue;
 
             NSUInteger n = root.subviews.count;
+            int streak = (int)w.tag;          // 用 tag 记连续空扫描次数
+
+            WIN_LOG(@"scan level=%.0f vc=%@ h=%d sub=%lu streak=%d",
+                    (double)lv,
+                    vc ? NSStringFromClass([vc class]) : @"(nil)",
+                    (int)w.hidden, (unsigned long)n, streak);
 
             if (n == 0) {
-                // 空的全屏高位窗口 → 关掉交互，让触摸穿透
-                if (root.isUserInteractionEnabled) {
-                    root.userInteractionEnabled = NO;
-                    [gDisabled addObject:root];
-                    WIN_LOG(@"禁用空窗口交互 level=%.0f root=%@ frame=%.0fx%.0f",
-                            (double)lv, NSStringFromClass([root class]),
-                            root.frame.size.width, root.frame.size.height);
+                streak++;
+                w.tag = streak;
+                // 连续两次都是空壳 → 直接隐藏（隐藏的窗口不参与命中测试，触摸必然落到主窗口）
+                if (streak >= 2 && !w.hidden) {
+                    w.hidden = YES;
+                    WIN_LOG(@"隐藏空窗口 level=%.0f vc=%@", (double)lv,
+                            vc ? NSStringFromClass([vc class]) : @"(nil)");
                 }
-            } else if (HTIsOurDisabled(root) && !root.isUserInteractionEnabled) {
-                // 它开始有内容了 → 还原
-                root.userInteractionEnabled = YES;
-                [gDisabled removeObject:root];
-                WIN_LOG(@"空窗口长出 %lu 个子视图，恢复交互 level=%.0f",
-                        (unsigned long)n, (double)lv);
+            } else {
+                w.tag = 0;
             }
         } @catch (NSException *e) { (void)e; }
     }
