@@ -46,8 +46,8 @@ extern int ptrace(int request, pid_t pid, caddr_t addr, int data);
 // ---------------------------------------------------------------------------
 // 日志
 // ---------------------------------------------------------------------------
-extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
-#define HM_LOG(fmt, ...) HTWriteLog("HeJiaBypass", fmt, ##__VA_ARGS__)
+extern "C" void HTLog(const char *tag, NSString *msg);
+#define HM_LOG(...) HTLog("HeJiaBypass", [NSString stringWithFormat:__VA_ARGS__])
 
 // ---------------------------------------------------------------------------
 // 工具：仅当方法真实存在才替换，避免向不存在的类注入导致崩溃
@@ -219,8 +219,10 @@ static int HMHookAllClassesImplementing(SEL sel, IMP newImp, const char *label) 
 
         if (hit && HMClassBelongsToApp(c)) {
             method_setImplementation(hit, newImp);
-            HM_LOG(@"hook [%s %@] (%s)", class_getName(c),
-                   NSStringFromSelector(sel), label);
+            HM_LOG(@"hook [%@ %@] (%@)",
+                   [NSString stringWithUTF8String:class_getName(c) ?: "?"],
+                   NSStringFromSelector(sel),
+                   [NSString stringWithUTF8String:label ?: "?"]);
             count++;
         }
         free(methods);

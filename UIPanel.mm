@@ -26,9 +26,9 @@
 
 #include <substrate.h>
 
-extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+extern "C" void HTLog(const char *tag, NSString *msg);
 extern "C" const char *HTGetLogFilePath(void);
-#define UI_LOG(fmt, ...) HTWriteLog("HeJiaUI", fmt, ##__VA_ARGS__)
+#define UI_LOG(...) HTLog("HeJiaUI", [NSString stringWithFormat:__VA_ARGS__])
 
 extern "C" {
 

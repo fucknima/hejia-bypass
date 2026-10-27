@@ -1,20 +1,18 @@
 // ============================================================================
-//  日志落盘模块 v2
+//  日志落盘模块 v3
 //  Bundle: com.cmcc.zhihuiguanjia
 // ----------------------------------------------------------------------------
-//  ⚠️ v1 的错误：写到 App 自己的 Library/Caches/，文件 App 根本看不到。
-//     要在「文件」App 里可见，必须满足：
-//       1) 写到 App Group 共享容器（或 Documents + 开启文件共享）
-//       2) Info.plist 里 UIFileSharingEnabled = YES
-//          与 LSSupportsOpeningDocumentsInPlace = YES
+//  ⚠️ 崩溃历史：
+//    v2: HTWriteLog 内部用 va_arg(cp, id) 解析 %@ 参数。
+//        变参表里只要有一个非对象参数（CGRect 按值传、int、double…），
+//        在 ARC 下就会被当成 id 去 objc_retain → EXC_BAD_ACCESS 崩溃
+//        (栈：objc_retain <- HTWriteLog，thread com.apple.root.utility-qos)
 //
-//  本模块同时向多处写，任一可用即可取到：
-//     A. App Group: group.com.cmcc.zhihuiguanjia/HeJiaTool/HeJiaTool.log
-//        （若重签时保留了该 group entitlements，文件 App 中可见）
-//     B. App Documents/HeJiaTool/（需 Info.plist 开启文件共享）
-//     C. Library/Caches/HeJiaTool/（兜底，仅第三方工具可读）
-//
-//  另外主动尝试修正 Info.plist（运行期无效，但会记录供打包时参考）。
+//  v3 方案：彻底不在 C 函数里解析变参
+//    调用方直接用 NSString 拼好内容，只传一个 NSString 进来：
+//        HTLog(tag, NSString *line)
+//        宏展开为：HTLog("tag", [NSString stringWithFormat:...])
+//    这样 %@ 由系统的 stringWithFormat 处理，永远不会错位。
 // ============================================================================
 
 #import <Foundation/Foundation.h>
@@ -31,14 +29,15 @@ static pthread_mutex_t gLogLock = PTHREAD_MUTEX_INITIALIZER;
 
 extern "C" {
 
-void HTWriteLog(const char *tag, NSString *fmt, ...);
-void HTWriteScanResult(NSString *fmt, ...);
 const char *HTGetLogFilePath(void);
 const char *HTGetAdScanLogPath(void);
 const char *HTGetLogDir(void);
+void HTLog(const char *tag, NSString *msg);
+void HTLogC(const char *tag, const char *cfmt, ...);
+void HTScan(NSString *msg);
 
 // ---------------------------------------------------------------------------
-// 解析最佳可写目录（优先级 A > B > C）
+// 目录：只写 App Group 共享容器
 // ---------------------------------------------------------------------------
 static const char *HTResolveDir(void) {
     static char dir[1200] = {0};
@@ -47,42 +46,34 @@ static const char *HTResolveDir(void) {
 
     @autoreleasepool {
         NSFileManager *fm = [NSFileManager defaultManager];
-
-        // 只写共享容器（App Group）——用户在签名时会开启文件共享
-        NSURL *groupURL = [fm containerURLForSecurityApplicationGroupIdentifier:
-                              [NSString stringWithUTF8String:GROUP_ID]];
         NSString *chosen = nil;
-        if (groupURL) {
-            chosen = [groupURL.path stringByAppendingPathComponent:@"HeJiaTool"];
-            NSError *e = nil;
-            if (![fm createDirectoryAtPath:chosen withIntermediateDirectories:YES
-                                attributes:nil error:&e]) {
-                (void)e;
-                chosen = groupURL.path;   // 直接放 group 根目录
+
+        @try {
+            NSURL *g = [fm containerURLForSecurityApplicationGroupIdentifier:
+                           [NSString stringWithUTF8String:GROUP_ID]];
+            if (g && g.path) {
+                NSString *sub = [g.path stringByAppendingPathComponent:@"HeJiaTool"];
+                NSError *e = nil;
+                if ([fm createDirectoryAtPath:sub withIntermediateDirectories:YES
+                                   attributes:nil error:&e]) {
+                    chosen = sub;
+                } else {
+                    chosen = g.path;
+                }
             }
-            // 探针：验证真能写
-            NSString *probe = [chosen stringByAppendingPathComponent:@".probe"];
-            NSError *wErr = nil;
-            if ([@"ok" writeToFile:probe atomically:YES
-                          encoding:NSUTF8StringEncoding error:&wErr]) {
-                NSError *rErr = nil;
-                [fm removeItemAtPath:probe error:&rErr];
-                (void)rErr;
-            } else {
-                chosen = nil;   // 写不进去就当不可用
-            }
+        } @catch (NSException *ex) {
+            (void)ex;
         }
 
-        // 共享容器不可用时的降级（仅记录，不指望文件 App 能看到）
         if (!chosen) {
-            NSArray *docPaths = NSSearchPathForDirectoriesInDomains(
+            NSArray *docs = NSSearchPathForDirectoriesInDomains(
                 NSDocumentDirectory, NSUserDomainMask, YES);
-            if (docPaths.count > 0) {
-                chosen = [docPaths[0] stringByAppendingPathComponent:@"HeJiaTool"];
-                NSError *dErr = nil;
-                [fm createDirectoryAtPath:chosen withIntermediateDirectories:YES
-                               attributes:nil error:&dErr];
-                (void)dErr;
+            if (docs.count > 0) {
+                NSString *sub = [docs[0] stringByAppendingPathComponent:@"HeJiaTool"];
+                NSError *e2 = nil;
+                [fm createDirectoryAtPath:sub withIntermediateDirectories:YES
+                               attributes:nil error:&e2];
+                chosen = sub;
             } else {
                 chosen = NSTemporaryDirectory();
             }
@@ -119,88 +110,52 @@ static void HTRotate(const char *path) {
 }
 
 // ---------------------------------------------------------------------------
-// 支持 %@ 的格式化（必须自己解析，否则对象指针会被当 char* 读）
+// 核心：写入已经拼好的 NSString（无变参解析，绝对安全）
 // ---------------------------------------------------------------------------
-static NSString *HTFormat(NSString *nsfmt, va_list ap) {
-    if (!nsfmt) return @"";
-    const char *fmt = nsfmt.UTF8String;
-    if (!fmt) return @"";
+static void HTWriteLine(const char *path, const char *tag, NSString *msg) {
+    if (!path || !msg) return;
 
-    NSMutableString *out = [NSMutableString string];
-    const char *p = fmt;
-    char seg[2048];
-    size_t segLen = 0;
-
-    va_list cp;
-    va_copy(cp, ap);
-
-    while (*p) {
-        if (*p == '%' && *(p + 1) == '@') {
-            if (segLen > 0) {
-                seg[segLen] = '\0';
-                char tmp[4096];
-                vsnprintf(tmp, sizeof(tmp), seg, cp);
-                NSString *s = [NSString stringWithUTF8String:tmp];
-                [out appendString:s ?: @""];
-                segLen = 0;
-            }
-            id obj = va_arg(cp, id);
-            @try {
-                NSString *s = [obj description];
-                [out appendString:s ?: @"(null)"];
-            } @catch (NSException *e) {
-                (void)e;
-                [out appendString:@"<desc-error>"];
-            }
-            p += 2;
-        } else {
-            if (segLen < sizeof(seg) - 2) seg[segLen++] = *p;
-            p++;
-        }
-    }
-    if (segLen > 0) {
-        seg[segLen] = '\0';
-        char tmp[4096];
-        vsnprintf(tmp, sizeof(tmp), seg, cp);
-        NSString *s = [NSString stringWithUTF8String:tmp];
-        [out appendString:s ?: @""];
-    }
-    va_end(cp);
-    return out;
-}
-
-static void HTWriteTo(const char *path, const char *tag, NSString *fmt, va_list ap) {
     @autoreleasepool {
-        NSString *body = HTFormat(fmt, ap);
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
         df.dateFormat = @"MM-dd HH:mm:ss.SSS";
         NSString *ts = [df stringFromDate:[NSDate date]];
 
         NSString *line = tag
             ? [NSString stringWithFormat:@"%@ [%@] %@\n", ts,
-                                        [NSString stringWithUTF8String:tag], body]
-            : [NSString stringWithFormat:@"%@ %@\n", ts, body];
+                                        [NSString stringWithUTF8String:tag], msg]
+            : [NSString stringWithFormat:@"%@ %@\n", ts, msg];
 
-        fprintf(stderr, "%s", line.UTF8String ?: "");
+        const char *cs = line.UTF8String;
+        if (!cs) return;
+
+        fprintf(stderr, "%s", cs);
 
         pthread_mutex_lock(&gLogLock);
         HTRotate(path);
         FILE *fp = fopen(path, "a");
-        if (fp) { fputs(line.UTF8String ?: "", fp); fclose(fp); }
+        if (fp) { fputs(cs, fp); fclose(fp); }
         pthread_mutex_unlock(&gLogLock);
     }
 }
 
-void HTWriteLog(const char *tag, NSString *fmt, ...) {
-    va_list ap; va_start(ap, fmt);
-    HTWriteTo(HTGetLogFilePath(), tag, fmt, ap);
-    va_end(ap);
+void HTLog(const char *tag, NSString *msg) {
+    HTWriteLine(HTGetLogFilePath(), tag, msg);
 }
 
-void HTWriteScanResult(NSString *fmt, ...) {
-    va_list ap; va_start(ap, fmt);
-    HTWriteTo(HTGetAdScanLogPath(), NULL, fmt, ap);
+void HTScan(NSString *msg) {
+    HTWriteLine(HTGetAdScanLogPath(), NULL, msg);
+}
+
+// 纯 C 格式版本（不含 %@），给不想用 NSString 的地方用
+void HTLogC(const char *tag, const char *cfmt, ...) {
+    if (!cfmt) return;
+    char buf[2048];
+    va_list ap;
+    va_start(ap, cfmt);
+    vsnprintf(buf, sizeof(buf), cfmt, ap);
     va_end(ap);
+    NSString *s = [NSString stringWithUTF8String:buf];
+    HTWriteLine(HTGetLogFilePath(), tag, s ?: @"");
 }
 
 // ---------------------------------------------------------------------------
@@ -208,24 +163,23 @@ __attribute__((constructor))
 static void HTLogInit(void) {
     @autoreleasepool {
         NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
-        NSString *ver = info[@"CFBundleShortVersionString"] ?: @"?";
+        NSString *ver = @"?";
+        @try { ver = info[@"CFBundleShortVersionString"] ?: @"?"; } @catch (NSException *e) { (void)e; }
 
-        // 用 NSFileManager containerURLForSecurityApplicationGroupIdentifier
-        // 会检查 entitlements；拿不到就说明重签时丢了 App Group
-        NSURL *g = [[NSFileManager defaultManager]
-            containerURLForSecurityApplicationGroupIdentifier:
-                [NSString stringWithUTF8String:GROUP_ID]];
+        BOOL groupOK = NO;
+        @try {
+            NSURL *g = [[NSFileManager defaultManager]
+                containerURLForSecurityApplicationGroupIdentifier:
+                    [NSString stringWithUTF8String:GROUP_ID]];
+            groupOK = (g != nil);
+        } @catch (NSException *e) { (void)e; }
 
-        id fsVal = info[@"UIFileSharingEnabled"];
-        BOOL fileSharing = fsVal ? ([fsVal description] && YES) : NO;
-
-        HTWriteLog("HeJiaTool", @"==================== 新会话 ====================");
-        HTWriteLog("HeJiaTool", @"App %@", ver);
-        HTWriteLog("HeJiaTool", @"日志目录: %@", [NSString stringWithUTF8String:HTGetLogDir()]);
-        HTWriteLog("HeJiaTool", @"AppGroup 可用: %@", g ? @"YES" : @"NO（重签丢失 group）");
-        HTWriteLog("HeJiaTool", @"Info.plist 文件共享: %@", fileSharing ? @"YES" : @"NO");
-        HTWriteLog("HeJiaTool", @"提示：若上面两项都是 NO，文件 App 看不到此日志，"
-                                @"需在重签时补 entitlements 与 Info.plist");
+        HTLog("HeJiaTool", @"==================== 新会话 ====================");
+        HTLog("HeJiaTool", [NSString stringWithFormat:@"App %@", ver]);
+        HTLog("HeJiaTool", [NSString stringWithFormat:@"日志目录: %@",
+                            [NSString stringWithUTF8String:HTGetLogDir()]]);
+        HTLog("HeJiaTool", [NSString stringWithFormat:@"AppGroup 可用: %@",
+                            groupOK ? @"YES" : @"NO"]);
     }
 }
 

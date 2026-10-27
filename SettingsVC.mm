@@ -11,10 +11,10 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+extern "C" void HTLog(const char *tag, NSString *msg);
 extern "C" const char *HTGetLogFilePath(void);
 extern "C" const char *HTGetAdScanLogPath(void);
-#define SVC_LOG(fmt, ...) HTWriteLog("HeJiaUI", fmt, ##__VA_ARGS__)
+#define SVC_LOG(...) HTLog("HeJiaUI", [NSString stringWithFormat:__VA_ARGS__])
 
 extern "C" {
 
@@ -183,7 +183,6 @@ extern UIViewController *HTMakeSettingsVC(void);
         default:
             break;
     }
-    [ud synchronize];
 }
 
 @end

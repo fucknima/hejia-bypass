@@ -22,8 +22,8 @@
 
 #include <substrate.h>
 
-extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
-#define TAB_LOG(fmt, ...) HTWriteLog("HeJiaTab", fmt, ##__VA_ARGS__)
+extern "C" void HTLog(const char *tag, NSString *msg);
+#define TAB_LOG(...) HTLog("HeJiaTab", [NSString stringWithFormat:__VA_ARGS__])
 
 extern "C" {
 
@@ -100,8 +100,8 @@ static void HTSetViewControllers(UITabBarController *self, SEL _cmd, NSArray *vc
 
     if (kept && kept.count > 0 && kept.count < vcs.count) {
         filtered = kept;
-        TAB_LOG(@"setViewControllers: %lu -> %lu", (unsigned long)vcs.count,
-                (unsigned long)kept.count);
+        TAB_LOG(@"setViewControllers: %lu -> %lu",
+                (unsigned long)vcs.count, (unsigned long)kept.count);
     } else {
         filtered = vcs;
     }

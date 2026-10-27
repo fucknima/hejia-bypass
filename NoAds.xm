@@ -26,9 +26,12 @@
 
 #include <substrate.h>
 
-extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
-extern "C" void HTWriteScanResult(NSString *fmt, ...);
-#define NA_LOG(fmt, ...) HTWriteLog("HeJiaNoAds", fmt, ##__VA_ARGS__)
+extern "C" void HTLog(const char *tag, NSString *msg);
+extern "C" void HTScan(NSString *msg);
+extern "C" void HTLogC(const char *tag, const char *cfmt, ...);
+#define NA_LOG(...) HTLog("HeJiaNoAds", [NSString stringWithFormat:__VA_ARGS__])
+// 扫描输出：纯 C 格式（不含 %@），避免变参解析
+#define NA_SCAN(cfmt, ...) HTLogC("SCAN", cfmt, ##__VA_ARGS__)
 
 extern "C" {
 
@@ -140,7 +143,7 @@ static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handle
     if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
         NSString *u = [req.URL absoluteString];
         NA_LOG(@"拦截广告请求: %@", u);
-        HTWriteScanResult(@"[BLOCKED] %s\n", (u.UTF8String ?: "?"));
+        NA_SCAN("[BLOCKED] %s\n", (u.UTF8String ?: "?"));
         if (h) {
             // 返回空 JSON，让上层认为「没广告」
             NSData *empty = [@"{\"data\":[],\"resultCode\":\"0\",\"code\":0}" dataUsingEncoding:NSUTF8StringEncoding];
@@ -178,8 +181,8 @@ static void na_patchAdSDKClasses(void) {
     if (!all) return;
 
     int patched = 0;
-    HTWriteScanResult(@"\n===== 广告 SDK 扫描 =====\n");
-    HTWriteScanResult(@"# 枚举到的类总数: %u\n", total);
+    NA_SCAN("\n===== 广告 SDK 扫描 =====\n");
+    NA_SCAN("# 枚举到的类总数: %u\n", total);
 
     // 统计各家 SDK 命中情况
     int statABU = 0, statGDT = 0, statKS = 0, statBaidu = 0, statJAD = 0,
@@ -202,7 +205,7 @@ static void na_patchAdSDKClasses(void) {
         else if (strncmp(cn, "MIGU", 4) == 0) statMIGU++;
         else statOther++;
 
-        HTWriteScanResult(@"[CLASS] %s\n", cn);
+        NA_SCAN("[CLASS] %s\n", cn);
 
         for (int pass = 0; pass < 2; pass++) {
             Class target = (pass == 0) ? object_getClass(c) : c;
@@ -245,16 +248,16 @@ static void na_patchAdSDKClasses(void) {
     }
     free(all);
 
-    HTWriteScanResult(@"\n# 分类统计\n");
-    HTWriteScanResult(@"  穿山甲/ABU : %d\n", statABU);
-    HTWriteScanResult(@"  优量汇/GDT : %d\n", statGDT);
-    HTWriteScanResult(@"  快手/KSAd  : %d\n", statKS);
-    HTWriteScanResult(@"  百度/Baidu : %d\n", statBaidu);
-    HTWriteScanResult(@"  京准通/JAD : %d\n", statJAD);
-    HTWriteScanResult(@"  阿里/DSP   : %d\n", statDSP);
-    HTWriteScanResult(@"  咪咕/MIGU  : %d\n", statMIGU);
-    HTWriteScanResult(@"  其他       : %d\n", statOther);
-    HTWriteScanResult(@"  已屏蔽方法 : %d\n", patched);
+    NA_SCAN("\n# 分类统计\n");
+    NA_SCAN("  穿山甲/ABU : %d\n", statABU);
+    NA_SCAN("  优量汇/GDT : %d\n", statGDT);
+    NA_SCAN("  快手/KSAd  : %d\n", statKS);
+    NA_SCAN("  百度/Baidu : %d\n", statBaidu);
+    NA_SCAN("  京准通/JAD : %d\n", statJAD);
+    NA_SCAN("  阿里/DSP   : %d\n", statDSP);
+    NA_SCAN("  咪咕/MIGU  : %d\n", statMIGU);
+    NA_SCAN("  其他       : %d\n", statOther);
+    NA_SCAN("  已屏蔽方法 : %d\n", patched);
 
     NA_LOG(@"广告 SDK 方法屏蔽 %d 个（明细见 adscan.log）", patched);
 }
@@ -306,7 +309,6 @@ static void na_patchSwitch(void) {
 
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setBool:YES forKey:@"adSwitchCloseStateStr"];
-    [ud synchronize];
 }
 
 static void na_patchShowFlags(void) {
