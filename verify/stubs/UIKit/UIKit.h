@@ -8,6 +8,8 @@ typedef double CGFloat;
 typedef struct { CGFloat x, y; } CGPoint;
 typedef struct { CGFloat width, height; } CGSize;
 typedef struct { CGPoint origin; CGSize size; } CGRect;
+typedef struct { NSUInteger location, length; } NSRange;
+NSRange NSMakeRange(NSUInteger l, NSUInteger n);
 typedef struct CGContext *CGContextRef;
 extern const CGPoint CGPointZero;
 
@@ -43,6 +45,7 @@ void CGContextSetLineWidth(CGContextRef c, CGFloat w);
 @end
 @interface UIColor : NSObject
 + (UIColor *)labelColor;
++ (UIColor *)systemBackgroundColor;
 + (UIColor *)systemBlueColor;
 + (UIColor *)whiteColor;
 + (UIColor *)systemGroupedBackgroundColor;
@@ -72,6 +75,7 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic, readonly) UIView *superview;
 @property (nonatomic, readonly) id window;
 @property (nonatomic) BOOL hidden;
+@property (nonatomic, strong) UIColor *backgroundColor;
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
@@ -106,6 +110,18 @@ enum { UIControlEventTouchUpInside = 64, UIControlEventValueChanged = 4096,
 - (void)addTarget:(id)t action:(SEL)a forControlEvents:(NSUInteger)e;
 @end
 
+@interface UIFont : NSObject
++ (UIFont *)monospacedSystemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
+@end
+@interface UITextView : UIView
+- (instancetype)initWithFrame:(CGRect)f;
+@property (nonatomic, copy) NSString *text;
+@property (nonatomic, strong) UIFont *font;
+@property (nonatomic, strong) UIColor *textColor;
+@property (nonatomic) BOOL editable;
+@property (nonatomic) BOOL alwaysBounceVertical;
+- (void)scrollRangeToVisible:(NSRange)r;
+@end
 @interface UILabel : UIView
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, strong) UIColor *textColor;
@@ -136,12 +152,14 @@ enum { UITableViewStyleInsetGrouped = 2 };
 @interface UIBarButtonItem : NSObject
 - (instancetype)initWithBarButtonSystemItem:(NSInteger)i target:(id)t action:(SEL)a;
 - (instancetype)initWithImage:(UIImage *)img style:(NSInteger)s target:(id)t action:(SEL)a;
+- (instancetype)initWithTitle:(NSString *)t style:(NSInteger)s target:(id)tg action:(SEL)a;
 @end
 enum { UIBarButtonSystemItemDone = 0, UIBarButtonItemStylePlain = 0 };
 
 @interface UINavigationItem : NSObject
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, strong) UIBarButtonItem *rightBarButtonItem;
+@property (nonatomic, strong) UIBarButtonItem *leftBarButtonItem;
 @property (nonatomic, copy) NSArray<UIBarButtonItem *> *rightBarButtonItems;
 @end
 
@@ -154,6 +172,7 @@ enum { UIBarButtonSystemItemDone = 0, UIBarButtonItemStylePlain = 0 };
 @property (nonatomic, readonly) id navigationController;
 @property (nonatomic, readonly) UIPopoverPresentationController *popoverPresentationController;
 - (void)viewDidLoad;
+- (void)viewDidLayoutSubviews;
 - (void)presentViewController:(UIViewController *)vc animated:(BOOL)a completion:(void (^)(void))c;
 - (void)dismissViewControllerAnimated:(BOOL)a completion:(void (^)(void))c;
 @property (nonatomic, readonly) NSArray *childViewControllers;
@@ -179,7 +198,8 @@ enum { UIAlertControllerStyleActionSheet = 0, UIAlertControllerStyleAlert = 1 };
 @interface UINavigationController : UIViewController
 @property (nonatomic, readonly) UIViewController *topViewController;
 @property (nonatomic, readonly) NSArray *viewControllers;
-- (instancetype)initWithRootViewController:(UIViewController *)vc;@end
+- (instancetype)initWithRootViewController:(UIViewController *)vc;
+- (void)pushViewController:(UIViewController *)vc animated:(BOOL)a;@end
 @interface UINavigationControllerX : UIViewController
 - (instancetype)initWithRootViewController:(UIViewController *)vc;
 @end

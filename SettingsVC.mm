@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <stdlib.h>
 
 extern "C" void HTLog(const char *tag, NSString *msg);
 extern "C" const char *HTGetLogFilePath(void);
@@ -31,6 +32,7 @@ static void HTPostTabbarChanged(void) {
 }
 
 extern "C" UIViewController *HTMakeSettingsVC(void);
+extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
 
 // ===========================================================================
 @interface HTSettingsViewController : UITableViewController
@@ -50,10 +52,41 @@ extern "C" UIViewController *HTMakeSettingsVC(void);
                                                       target:self
                                                       action:@selector(dismissSelf)];
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
+
+    // 左上角：强制退出 App
+    self.navigationItem.leftBarButtonItem =
+        [[UIBarButtonItem alloc] initWithTitle:@"退出"
+                                         style:UIBarButtonItemStylePlain
+                                        target:self
+                                        action:@selector(forceQuitTapped)];
 }
 
 - (void)dismissSelf {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - 强制退出
+
+- (void)forceQuitTapped {
+    UIAlertController *a = [UIAlertController
+        alertControllerWithTitle:@"强制退出 App"
+                         message:@"立即终止进程（不会做任何保存），确定吗？"
+                  preferredStyle:UIAlertControllerStyleAlert];
+    [a addAction:[UIAlertAction actionWithTitle:@"取消"
+                                          style:UIAlertActionStyleCancel
+                                        handler:nil]];
+    [a addAction:[UIAlertAction actionWithTitle:@"退出"
+                                          style:UIAlertActionStyleDestructive
+                                        handler:^(UIAlertAction *act) {
+        (void)act;
+        SVC_LOG(@"用户触发强制退出");
+        // 留一点时间把日志刷到磁盘再杀
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            exit(0);
+        });
+    }]];
+    [self presentViewController:a animated:YES completion:nil];
 }
 
 #pragma mark - 数据源
@@ -135,17 +168,12 @@ extern "C" UIViewController *HTMakeSettingsVC(void);
     [tv deselectRowAtIndexPath:ip animated:YES];
     if (ip.section == 2) {
         const char *p = (ip.row == 0) ? HTGetLogFilePath() : HTGetAdScanLogPath();
-        NSString *path = [NSString stringWithUTF8String:p ?: ""];
-        [UIPasteboard generalPasteboard].string = path;
-
-        UIAlertController *a = [UIAlertController
-            alertControllerWithTitle:@"日志路径（已复制）"
-                             message:path
-                      preferredStyle:UIAlertControllerStyleAlert];
-        [a addAction:[UIAlertAction actionWithTitle:@"好"
-                                              style:UIAlertActionStyleDefault
-                                            handler:nil]];
-        [self presentViewController:a animated:YES completion:nil];
+        NSString *path  = [NSString stringWithUTF8String:(p ? p : "")];
+        NSString *title = (ip.row == 0) ? @"主日志" : @"扫描明细";
+        UIViewController *vc = HTMakeLogViewer(path, title);
+        if (self.navigationController) {
+            [self.navigationController pushViewController:vc animated:YES];
+        }
         return;
     }
     if (ip.section == 1) {

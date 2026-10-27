@@ -11,7 +11,7 @@ TWEAK_NAME = HeJiaBypass
 #   UIPanel.mm    我的页右上角图标入口
 #   SettingsVC.mm 设置页
 #   TabHide.mm    隐藏「服务」「发现」
-HeJiaBypass_FILES = Tweak.xm NoAds.xm NoAdsPlus.xm UIPanel.mm SettingsVC.mm TabHide.mm LogFile.mm
+HeJiaBypass_FILES = Tweak.xm NoAds.xm NoAdsPlus.xm LogViewer.mm UIPanel.mm SettingsVC.mm TabHide.mm LogFile.mm
 
 HeJiaBypass_CFLAGS = -fobjc-arc -O2 -Wno-deprecated-declarations
 HeJiaBypass_FRAMEWORKS = Foundation UIKit CoreFoundation CFNetwork
