@@ -233,7 +233,7 @@ static id np_myinfoGetView(id self, SEL _cmd, NSArray *dicts, id tabId, id realT
     return np_orig_myinfo ? ((fn_t)np_orig_myinfo)(self, _cmd, kept, tabId, realTabId, block) : nil;
 }
 
-static void np_patch_myinfo(void) {
+__attribute__((unused)) static void np_patch_myinfo(void) {
     Class c = objc_getClass("HYMyInfoComponentManager");
     if (!c) return;
     Method m = class_getInstanceMethod(c, sel_registerName("getViewWithComponentDictArray:tabId:realTabId:completeBlock:"));
@@ -256,7 +256,7 @@ static void np_cncAdMove(id self, SEL _cmd) {
     }
 }
 
-static void np_patch_cnc_ad(void) {
+__attribute__((unused)) static void np_patch_cnc_ad(void) {
     Class c = objc_getClass("HYCNCAdBanner");
     if (!c) return;
     Method m = class_getInstanceMethod(c, sel_registerName("didMoveToWindow"));
@@ -287,7 +287,7 @@ static id np_compGetView(id self, SEL _cmd, NSArray *dicts, id tabId, id block) 
     return np_orig_compGet ? ((fn_t)np_orig_compGet)(self, _cmd, dicts, tabId, block) : nil;
 }
 
-static void np_patch_comp_log(void) {
+__attribute__((unused)) static void np_patch_comp_log(void) {
     Class c = objc_getClass("HYComponentManager");
     if (!c) return;
     Method m = class_getInstanceMethod(c, sel_registerName("getViewWithComponentDictArray:tabId:completeBlock:"));
