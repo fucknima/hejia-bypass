@@ -6,6 +6,7 @@
 //    - 隐藏「服务」页面（可控）
 //    - 隐藏「发现」页面（可控）
 //    - 隐藏中间「AI灵犀」（可控）
+//    - 屏蔽运营位推广（可控，默认关）
 //    - 过签名检测（强制开启，开关置灰，点击提示）
 // ============================================================================
 
@@ -25,6 +26,7 @@ static NSString *const kNoAdsKey       = @"HeJiaTool_NoAds";
 static NSString *const kHideServiceKey = @"HeJiaTool_HideService";
 static NSString *const kHideFindKey    = @"HeJiaTool_HideFind";
 static NSString *const kHideAIKey      = @"HeJiaTool_HideAI";
+static NSString *const kNoOpsKey       = @"HeJiaTool_NoOps";
 static NSString *const kInjectedKey    = @"HeJiaTool_Injected";
 
 static void HTPostTabbarChanged(void) {
@@ -108,7 +110,7 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
 
 - (NSInteger)tableView:(UITableView *)tv numberOfRowsInSection:(NSInteger)s {
     (void)tv;
-    if (s == 0) return 4;
+    if (s == 0) return 5;
     if (s == 1) return 1;
     return 2;
 }
@@ -130,8 +132,9 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
 
     if (ip.section == 0) {
-        NSString *keys[4]  = { kNoAdsKey, kHideServiceKey, kHideFindKey, kHideAIKey };
-        NSString *titles[4] = { @"屏蔽广告与推广", @"隐藏「服务」页面", @"隐藏「发现」页面", @"隐藏中间「AI灵犀」" };
+        NSString *keys[5]  = { kNoAdsKey, kHideServiceKey, kHideFindKey, kHideAIKey, kNoOpsKey };
+        NSString *titles[5] = { @"屏蔽广告与推广", @"隐藏「服务」页面（暂停）", @"隐藏「发现」页面（暂停）",
+                                @"隐藏中间「AI灵犀」（暂停）", @"屏蔽运营位推广" };
 
         cell.textLabel.text = titles[ip.row];
         cell.textLabel.textColor = [UIColor labelColor];
@@ -213,6 +216,12 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
             [ud setBool:sw.isOn forKey:kHideAIKey];
             SVC_LOG(@"隐藏 AI灵犀 = %@", sw.isOn ? @"开" : @"关");
             HTPostTabbarChanged();
+            break;
+        case 104:
+            [ud setBool:sw.isOn forKey:kNoOpsKey];
+            SVC_LOG(@"屏蔽运营位 = %@", sw.isOn ? @"开" : @"关");
+            [[NSNotificationCenter defaultCenter]
+                postNotificationName:@"HeJiaTool_NoAdsChanged" object:nil];
             break;
         default:
             break;
