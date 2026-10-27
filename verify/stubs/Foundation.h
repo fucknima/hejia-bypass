@@ -95,14 +95,14 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (NSUInteger)indexOfObject:(T)o;
 @end
 
+@interface NSSet : NSObject <NSFastEnumeration>
+@property (readonly) NSUInteger count;
+@end
 @interface NSDictionary<K, V> : NSObject
 + (instancetype)dictionaryWithObjects:(const V [])objects forKeys:(const K [])keys count:(NSUInteger)cnt;
 - (V)objectForKeyedSubscript:(K)k;
 @end
 
-@interface NSValue : NSObject
-+ (NSValue *)valueWithRect:(void *)r;
-@end
 @interface NSData : NSObject
 + (instancetype)dataWithBytes:(const void *)b length:(unsigned long)l;
 @end

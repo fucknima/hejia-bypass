@@ -28,7 +28,7 @@ static void HTPostTabbarChanged(void) {
                                                         object:nil];
 }
 
-extern UIViewController *HTMakeSettingsVC(void);
+extern "C" UIViewController *HTMakeSettingsVC(void);
 
 // ===========================================================================
 @interface HTSettingsViewController : UITableViewController
@@ -188,7 +188,7 @@ extern UIViewController *HTMakeSettingsVC(void);
 @end
 
 // ===========================================================================
-UIViewController *HTMakeSettingsVC(void) {
+extern "C" UIViewController *HTMakeSettingsVC(void) {
     return [[HTSettingsViewController alloc] init];
 }
 

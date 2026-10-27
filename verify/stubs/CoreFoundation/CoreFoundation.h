@@ -15,6 +15,8 @@ extern const CFDictionaryValueCallBacks kCFTypeDictionaryValueCallBacks;
 CFDictionaryRef CFDictionaryCreate(CFAllocatorRef a, const void **k, const void **v, CFIndex n, const CFDictionaryKeyCallBacks *kb, const CFDictionaryValueCallBacks *vb);
 void CFRelease(CFTypeRef cf);
 CFDictionaryRef CFNetworkCopySystemProxySettings(void);
+double CACurrentMediaTime(void);
+typedef double CFTimeInterval;
 #ifdef __cplusplus
 }
 #endif

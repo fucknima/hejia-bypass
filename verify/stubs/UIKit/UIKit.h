@@ -9,6 +9,7 @@ typedef struct { CGFloat x, y; } CGPoint;
 typedef struct { CGFloat width, height; } CGSize;
 typedef struct { CGPoint origin; CGSize size; } CGRect;
 typedef struct CGContext *CGContextRef;
+extern const CGPoint CGPointZero;
 
 CGRect CGRectMake(CGFloat x, CGFloat y, CGFloat w, CGFloat h);
 CGSize CGSizeMake(CGFloat w, CGFloat h);
@@ -28,6 +29,13 @@ void CGContextSetLineWidth(CGContextRef c, CGFloat w);
 - (id)init;
 @end
 
+@interface UIEvent : NSObject
+@end
+@interface NSValue : NSObject
++ (NSValue *)valueWithRect:(CGRect)r;
+- (CGPoint)CGPointValue;
+- (CGRect)CGRectValue;
+@end
 @interface UIColor : NSObject
 + (UIColor *)labelColor;
 + (UIColor *)systemBlueColor;
@@ -58,6 +66,8 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
+- (void)sendEvent:(UIEvent *)e;
+- (void)motionEnded:(NSInteger)subtype withEvent:(UIEvent *)e;
 - (void)addGestureRecognizer:(id)g;
 - (void)removeGestureRecognizer:(id)g;
 @end
