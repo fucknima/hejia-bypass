@@ -223,6 +223,7 @@ enum { UIAlertControllerStyleActionSheet = 0, UIAlertControllerStyleAlert = 1 };
 + (instancetype)generalPasteboard;
 @property (nonatomic, copy) NSString *string;
 @end
+extern NSString *UIApplicationDidBecomeActiveNotification;
 @interface UIApplication : NSObject
 + (instancetype)sharedApplication;
 @property (nonatomic, readonly) NSArray<UIWindow *> *windows;

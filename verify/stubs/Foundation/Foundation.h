@@ -100,6 +100,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (void)addObjectsFromArray:(NSArray *)a;
 - (void)insertObject:(T)o atIndex:(NSUInteger)i;
 - (void)removeObjectAtIndex:(NSUInteger)i;
+- (void)removeObject:(T)o;
 - (void)removeLastObject;
 - (T)lastObject;
 - (void)setObject:(T)o atIndexedSubscript:(NSUInteger)i;
