@@ -22,6 +22,7 @@
 #import <objc/runtime.h>
 #import <string.h>
 #import <stdlib.h>
+#import <unistd.h>
 #import <dlfcn.h>
 
 #include <substrate.h>
