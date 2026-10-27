@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 typedef struct objc_method *Method;
+typedef struct objc_ivar *Ivar;
+Ivar class_getInstanceVariable(Class cls, const char *name);
+long ivar_getOffset(Ivar v);
 typedef void (*IMP)(void);
 typedef enum { OBJC_ASSOCIATION_ASSIGN = 0, OBJC_ASSOCIATION_RETAIN_NONATOMIC = 1,
                OBJC_ASSOCIATION_COPY_NONATOMIC = 3, OBJC_ASSOCIATION_RETAIN = 01401,

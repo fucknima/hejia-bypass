@@ -44,6 +44,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (BOOL)isKindOfClass:(Class)c;
 - (BOOL)respondsToSelector:(SEL)s;
 - (id)performSelector:(SEL)s;
+- (id)valueForKey:(NSString *)k;
 @end
 
 @protocol NSFastEnumeration
@@ -75,6 +76,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 @interface NSNumber : NSObject
 + (NSNumber *)numberWithBool:(BOOL)b;
 - (BOOL)boolValue;
+- (long)longValue;
 @end
 @interface NSArray<T> : NSObject <NSFastEnumeration>
 + (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;

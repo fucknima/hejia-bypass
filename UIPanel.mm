@@ -144,15 +144,21 @@ static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
 
     if (!event) return;
 
-    // UIEvent.type : 4 = touches
-    NSInteger type = [event respondsToSelector:sel_registerName("type")]
-                   ? (NSInteger)(long)objc_msgSend(event, sel_registerName("type"))
-                   : 0;
+    // UIEvent.type : 4 = touches（直接读 ivar，避免 objc_msgSend 类型问题）
+    NSInteger type = 0;
+    Ivar typeIvar = class_getInstanceVariable(object_getClass(event), "_type");
+    if (typeIvar) {
+        type = (NSInteger)(long)*(NSInteger *)((char *)(__bridge void *)event
+                                               + ivar_getOffset(typeIvar));
+    }
     if (type != 4) return;
 
-    id touchesObj = [event respondsToSelector:sel_registerName("allTouches")]
-                  ? objc_msgSend(event, sel_registerName("allTouches")) : nil;
-    NSSet *touches = (NSSet *)touchesObj;
+    // allTouches：用 NSObject 的 valueForKey 拿（安全，不需要 objc_msgSend）
+    NSSet *touches = nil;
+    if ([event respondsToSelector:sel_registerName("allTouches")]) {
+        id v = [event valueForKey:@"allTouches"];
+        if ([v isKindOfClass:[NSSet class]]) touches = (NSSet *)v;
+    }
     if (!touches) return;
     NSUInteger tcount = touches.count;
     if (tcount == 0) return;
@@ -162,7 +168,15 @@ static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
     BOOL anyBegan = NO;
     BOOL allEnded = YES;
     for (id t in touches) {
-        NSInteger phase = (NSInteger)(long)objc_msgSend(t, sel_registerName("phase"));
+        NSInteger phase = 0;
+        if ([t respondsToSelector:sel_registerName("phase")]) {
+            phase = (NSInteger)(long)[t valueForKey:@"phase"];
+            // valueForKey 可能返回 NSNumber
+            if (phase == 0) {
+                id pv = [t valueForKey:@"phase"];
+                if ([pv isKindOfClass:[NSNumber class]]) phase = [pv longValue];
+            }
+        }
         if (phase == 0) anyBegan = YES;
         if (phase != 3 && phase != 4) { active++; allEnded = NO; }
     }
@@ -197,10 +211,9 @@ static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
     if (anyBegan && tcount == 1) {
         for (id t in touches) {
             CGPoint p = CGPointZero;
-            id v = objc_msgSend(t, sel_registerName("locationInWindow"));
-            if (v) {
-                NSValue *nv = (NSValue *)v;
-                p = [nv CGPointValue];
+            id v = [t valueForKey:@"locationInWindow"];
+            if ([v isKindOfClass:[NSValue class]]) {
+                p = [(NSValue *)v CGPointValue];
             }
 
             // 状态栏区域：顶部 60pt 内、水平居右 1/3（避开灵动岛/刘海）
