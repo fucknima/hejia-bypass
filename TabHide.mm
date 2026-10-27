@@ -125,6 +125,7 @@ static void HTTabBarLayout(id self, SEL _cmd) {
 // ---------------------------------------------------------------------------
 // AI：只按类名，定时器里跑（window 已就绪）
 // ---------------------------------------------------------------------------
+__attribute__((unused))
 static void HTHideAIByClass(void) {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     if (![ud boolForKey:kHideAIKey]) return;
@@ -218,15 +219,17 @@ static void HeJiaTabInit(void) {
         [[NSNotificationCenter defaultCenter]
             addObserverForName:@"HeJiaTool_TabbarReload" object:nil
                          queue:[NSOperationQueue mainQueue]
-                    usingBlock:^(id note) { (void)note; HTScanAllBars(); HTHideAIByClass(); }];
+                    usingBlock:^(id note) { (void)note; HTScanAllBars(); }];
 
-        const int64_t delays[] = { 1500, 4000, 8000, 15000, 25000 };
-        for (int i = 0; i < 5; i++) {
+        // 本轮定位期间暂停 AI 隐藏：它是 v7 相对 v3 唯一新增的行为
+        const int64_t delays[] = { 1500, 4000, 8000 };
+        for (int i = 0; i < 3; i++) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delays[i] * 1000000LL),
                            dispatch_get_main_queue(), ^{
-                @try { HTScanAllBars(); HTHideAIByClass(); } @catch (NSException *e) { (void)e; }
+                @try { HTScanAllBars(); } @catch (NSException *e) { (void)e; }
             });
         }
+        TAB_LOG(@"AI 隐藏本轮暂停（定位中），只用 HTHideAIByClass 的代码保留不动");
 
         TAB_LOG(@"════ Tab 模块 v7 完成 ════");
     }
