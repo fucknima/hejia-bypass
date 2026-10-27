@@ -163,40 +163,70 @@ static void HTHideAI(UIView *tabBar) {
 }
 
 // ---------------------------------------------------------------------------
-// 均匀重排：只改 transform（平移），不触发父视图 layout
+// 均匀重排：把某一层里可见的按钮按 width*(i+0.5)/n 摆开
+//   App 的底栏是两层叠在一起：
+//     UITabBar
+//       ├ UITabBarButton ×5        ← 系统层（真正显示图标文字）
+//       └ HYCustomTabBar          ← 自定义层（AI 凸起/气泡在这里）
+//   只动自定义层的话，看起来完全没变化，所以两层都要排。
 // ---------------------------------------------------------------------------
+static void HTRepositionGroup(UIView *container, NSMutableArray *items) {
+    if (!container || items.count == 0) return;
+
+    NSMutableArray *vis = [NSMutableArray array];
+    for (UIView *v in items) {
+        if (v.hidden || v.alpha < 0.01) continue;
+        [vis addObject:v];
+    }
+    if (vis.count == 0 || vis.count > 6) return;
+
+    NSUInteger n = vis.count;
+    for (NSUInteger i = 1; i < n; i++) {
+        UIView *key = vis[i];
+        NSInteger k = (NSInteger)i - 1;
+        while (k >= 0 && ((UIView *)vis[(NSUInteger)k]).center.x > key.center.x) {
+            vis[(NSUInteger)(k + 1)] = vis[(NSUInteger)k];
+            k--;
+        }
+        vis[(NSUInteger)(k + 1)] = key;
+    }
+
+    CGFloat w = container.bounds.size.width;
+    if (w <= 1) return;
+
+    int moved = 0;
+    for (NSUInteger i = 0; i < n; i++) {
+        UIView *it = vis[i];
+        CGFloat dx = w * ((CGFloat)i + 0.5f) / (CGFloat)n - it.center.x;
+        if (fabs(it.transform.tx - dx) > 0.5f) {
+            it.transform = CGAffineTransformMakeTranslation(dx, 0);
+            moved++;
+        }
+    }
+    if (moved) TAB_LOG(@"重排 %@：n=%lu 移动 %d 个",
+                       NSStringFromClass([container class]), (unsigned long)n, moved);
+}
+
 static void HTRepositionItems(UIView *tabBar) {
     if (!tabBar) return;
 
-    NSMutableArray *visible = [NSMutableArray array];
-    for (UIView *v in tabBar.subviews) {
-        if (![v isKindOfClass:objc_getClass("HYCustomTabBarItem")]) continue;
-        if (v.hidden) continue;
-        [visible addObject:v];
-    }
-    if (visible.count == 0 || visible.count > 6) return;
-
-    // 按未变换的 center.x 排序
-    NSUInteger n = visible.count;
-    for (NSUInteger i = 1; i < n; i++) {
-        UIView *key = visible[i];
-        NSInteger j = (NSInteger)i - 1;
-        while (j >= 0 && ((UIView *)visible[(NSUInteger)j]).center.x > key.center.x) {
-            visible[(NSUInteger)(j + 1)] = visible[(NSUInteger)j];
-            j--;
-        }
-        visible[(NSUInteger)(j + 1)] = key;
+    // 1) 自定义层
+    Class itemCls = objc_getClass("HYCustomTabBarItem");
+    if (itemCls) {
+        NSMutableArray *a = [NSMutableArray array];
+        for (UIView *v in tabBar.subviews)
+            if ([v isKindOfClass:itemCls]) [a addObject:v];
+        HTRepositionGroup(tabBar, a);
     }
 
-    CGFloat w = tabBar.bounds.size.width;
-    if (w <= 1) return;
-
-    for (NSUInteger k = 0; k < n; k++) {
-        UIView *it = visible[k];
-        CGFloat dx = w * ((CGFloat)k + 0.5f) / (CGFloat)n - it.center.x;
-        if (fabs(it.transform.tx - dx) > 0.5f) {
-            it.transform = CGAffineTransformMakeTranslation(dx, 0);
-        }
+    // 2) 系统层（父视图是 UITabBar）
+    UIView *parent = tabBar.superview;
+    Class btnCls = objc_getClass("UITabBarButton");
+    if (parent && btnCls) {
+        NSMutableArray *a = [NSMutableArray array];
+        for (UIView *v in parent.subviews)
+            if ([v isKindOfClass:btnCls]) [a addObject:v];
+        HTRepositionGroup(parent, a);
     }
 }
 
