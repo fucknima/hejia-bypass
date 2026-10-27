@@ -209,6 +209,7 @@ static void na_patchAdSDKClasses(void) {
         statDSP = 0, statMIGU = 0, statOther = 0;
 
     for (unsigned int i = 0; i < total; i++) {
+        if ((i % 200) == 0) usleep(2000);     // 让出 CPU，避免启动期拖住主线程
         Class c = all[i];
         if (!c) continue;
         const char *cn = class_getName(c);
@@ -225,7 +226,7 @@ static void na_patchAdSDKClasses(void) {
         else if (strncmp(cn, "MIGU", 4) == 0) statMIGU++;
         else statOther++;
 
-        NA_SCAN("[CLASS] %s\n", cn);
+        if (patched <= 30) NA_SCAN("[CLASS] %s\n", cn);
 
         for (int pass = 0; pass < 2; pass++) {
             Class target = (pass == 0) ? object_getClass(c) : c;
@@ -378,6 +379,7 @@ static void na_patchShowFlags(void) {
     if (!all) return;
     int n = 0;
     for (unsigned int i = 0; i < total; i++) {
+        if ((i % 200) == 0) usleep(2000);
         Class c = all[i];
         if (!c || !na_isAppClass(c)) continue;
         unsigned int cnt = 0;
