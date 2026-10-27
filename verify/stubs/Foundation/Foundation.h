@@ -213,6 +213,7 @@ static const NSSearchPathDirectory NSCachesDirectory = 13;
 static const NSSearchPathDirectory NSDocumentDirectory = 9;
 static const NSSearchPathDomainMask NSUserDomainMask = 1;
 NSString *NSTemporaryDirectory(void);
+NSString *NSHomeDirectory(void);
 NSArray<NSString *> *NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory d, NSSearchPathDomainMask m, BOOL e);
 @interface NSDate : NSObject
 + (instancetype)date;
