@@ -127,6 +127,12 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 @end
 
 @interface NSURLResponse : NSObject @end
+@interface NSCachedURLResponse : NSObject @end
+@interface NSURLCache : NSObject
++ (instancetype)sharedURLCache;
+- (NSCachedURLResponse *)cachedResponseForRequest:(NSURLRequest *)r;
+- (void)removeAllCachedResponses;
+@end
 
 @interface NSURLSession : NSObject
 + (instancetype)sharedSession;

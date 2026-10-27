@@ -55,6 +55,13 @@ static const char *kAdURLMarkers[] = {
     "/ads/",
     "getBannerContentList",
     "getTabBannerList",
+    "/idx/",                 // 首页所有运营位（banner/推荐/活动）
+    "getMsiRecommendContentList",
+    "getLoginOperationList",
+    "getAiClawEntrance",
+    "getDeviceRecommendRuleList",
+    "/lecam/",               // 活动列表
+    "/ads/",
     "/ad/report",
     "/ad/click",
     "/ad/impression",
@@ -320,6 +327,21 @@ static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
     return na_orig_dataTaskReq ? ((fn_t)na_orig_dataTaskReq)(self, _cmd, req) : nil;
 }
 
+// ---------------------------------------------------------------------------
+// 缓存层：NSURLCache 命中缓存时也返回空（否则拦截了请求仍显示旧数据）
+// ---------------------------------------------------------------------------
+static IMP na_orig_cachedResponse = NULL;
+
+static NSCachedURLResponse *na_cachedResponse(id self, SEL _cmd, NSURLRequest *req) {
+    if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
+        NA_SCAN("[CACHE-BLOCKED] %s\n", ([[req.URL absoluteString] UTF8String] ?: "?"));
+        return nil;
+    }
+    typedef id (*fn_t)(id, SEL, NSURLRequest *);
+    return na_orig_cachedResponse
+         ? ((fn_t)na_orig_cachedResponse)(self, _cmd, req) : nil;
+}
+
 static void na_patchSwitch(void) {
     Class c = objc_getClass("HYGetAdSwitchState");
     if (!c) { NA_LOG(@"未找到 HYGetAdSwitchState"); return; }
@@ -392,6 +414,18 @@ static void HeJiaNoAdsInit(void) {
                 na_orig_dataTaskReq = method_getImplementation(m2);
                 method_setImplementation(m2, (IMP)na_dataTaskWithRequestOnly);
                 NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:]  <-- AF 路径");
+            }
+        }
+
+        // 缓存层
+        Class cacheCls = objc_getClass("NSURLCache");
+        if (cacheCls) {
+            Method cm = class_getInstanceMethod(cacheCls,
+                          @selector(cachedResponseForRequest:));
+            if (cm) {
+                na_orig_cachedResponse = method_getImplementation(cm);
+                method_setImplementation(cm, (IMP)na_cachedResponse);
+                NA_LOG(@"hook -[NSURLCache cachedResponseForRequest:]");
             }
         }
 

@@ -43,12 +43,11 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
     NSString *title   = vc.title;
     NSString *tabId   = nil;
 
-    // VC 上若有 tabbarId 属性，优先读取
-    SEL idSel = sel_registerName("tabbarId");
-    if ([vc respondsToSelector:idSel]) {
-        id v = ((id (*)(id, SEL))objc_msgSend)(vc, idSel);
-        if ([v isKindOfClass:[NSString class]]) tabId = v;
-    }
+    // VC 上若有 tabbarId 属性，优先读取（KVC，避免 objc_msgSend 类型问题）
+    @try {
+        id v = [vc valueForKey:@"tabbarId"];
+        if ([v isKindOfClass:[NSString class]]) tabId = (NSString *)v;
+    } @catch (NSException *e) { (void)e; }
 
     const char *cn = clsName.UTF8String;
     const char *tt = title.UTF8String;
@@ -74,6 +73,25 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
 }
 
 static void HTReapplyTabFilter(UITabBarController *tabC);
+
+// hook getter：读出来的时候就把被隐藏的 tab 剔掉
+static IMP HTOrig_getViewControllers = NULL;
+
+static NSArray *HTGetViewControllers(UITabBarController *self, SEL _cmd) {
+    typedef NSArray *(*fn_t)(id, SEL);
+    NSArray *orig = HTOrig_getViewControllers
+                  ? ((fn_t)HTOrig_getViewControllers)(self, _cmd) : nil;
+    if (!orig || orig.count == 0) return orig;
+
+    NSMutableArray *kept = [NSMutableArray arrayWithCapacity:orig.count];
+    BOOL changed = NO;
+    for (UIViewController *vc in orig) {
+        if (HTShouldHideTab(vc)) { changed = YES; continue; }
+        [kept addObject:vc];
+    }
+    if (!changed || kept.count == 0) return orig;
+    return kept;
+}
 
 // ---------------------------------------------------------------------------
 // hook: setViewControllers:
@@ -148,6 +166,39 @@ static void HTReapplyTabFilter(UITabBarController *tabC) {
 // 设置页改动后立即生效
 // ---------------------------------------------------------------------------
 
+static void HTForceReloadTabs(void) {
+    // 遍历所有 tabbar，强制重新 set 一次
+    UIWindow *keyWin = nil;
+    for (UIWindow *w in [UIApplication sharedApplication].windows) {
+        if (w.isKeyWindow) { keyWin = w; break; }
+    }
+    if (!keyWin) keyWin = [UIApplication sharedApplication].keyWindow;
+    if (!keyWin) return;
+
+    NSMutableArray *stack = [NSMutableArray array];
+    if (keyWin.rootViewController) [stack addObject:keyWin.rootViewController];
+
+    while (stack.count > 0) {
+        UIViewController *vc = [stack lastObject];
+        [stack removeLastObject];
+        if ([vc isKindOfClass:[UITabBarController class]]) {
+            UITabBarController *tb = (UITabBarController *)vc;
+            NSArray *cur = tb.viewControllers;
+            if (cur && cur.count > 0) {
+                // 用 setter 重新设置，触发我们的过滤
+                typedef void (*fn_t)(id, SEL, NSArray *);
+                if (HTOrig_setViewControllers) {
+                    ((fn_t)HTOrig_setViewControllers)(tb,
+                        sel_registerName("setViewControllers:"), cur);
+                }
+                TAB_LOG(@"强制重载 tab，当前 %lu 个",
+                        (unsigned long)cur.count);
+            }
+        }
+        for (UIViewController *c in vc.childViewControllers) [stack addObject:c];
+    }
+}
+
 static void HTOnTabbarReloadImpl(id note) {
     (void)note;
     UIWindow *keyWin = nil;
@@ -194,6 +245,12 @@ static void HeJiaTabInit(void) {
                 method_setImplementation(m, (IMP)HTSetViewControllers);
                 TAB_LOG(@"hook -[UITabBarController setViewControllers:]");
             }
+            Method g = class_getInstanceMethod(tabCls, @selector(viewControllers));
+            if (g) {
+                HTOrig_getViewControllers = method_getImplementation(g);
+                method_setImplementation(g, (IMP)HTGetViewControllers);
+                TAB_LOG(@"hook -[UITabBarController viewControllers] (getter)");
+            }
         }
 
         // block 形式注册，避免 selector 认知问题
@@ -204,6 +261,7 @@ static void HeJiaTabInit(void) {
                          queue:mainQ
                     usingBlock:^(id note) {
             HTOnTabbarReloadImpl(note);
+            HTForceReloadTabs();
         }];
         (void)token;
 

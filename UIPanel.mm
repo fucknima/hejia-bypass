@@ -111,6 +111,32 @@ static void HTShowMenu(void) {
         [HTTopMost() presentViewController:ok animated:YES completion:nil];
     }]];
 
+    [sheet addAction:[UIAlertAction actionWithTitle:@"🧹  清理广告缓存"
+                                              style:UIAlertActionStyleDestructive
+                                            handler:^(UIAlertAction *a) {
+        (void)a;
+        // 清 NSURLCache
+        NSURLCache *cache = [NSURLCache sharedURLCache];
+        [cache removeAllCachedResponses];
+        // 清用户默认值里的运营位缓存
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        for (NSString *k in @[@"TabbarsDictCache", @"TabBarPageDictCacheKey",
+                              @"shouldModifyTabbarInfoDict", @"ModifyTabbarInfoDict",
+                              @"ModifyTabbarsDictForProvice"]) {
+            [ud removeObjectForKey:k];
+        }
+        UI_LOG(@"已清理广告/运营位缓存");
+
+        UIAlertController *ok = [UIAlertController
+            alertControllerWithTitle:@"已清理"
+                             message:@"缓存已清除，请重启 App 生效"
+                      preferredStyle:UIAlertControllerStyleAlert];
+        [ok addAction:[UIAlertAction actionWithTitle:@"好"
+                                               style:UIAlertActionStyleDefault
+                                             handler:nil]];
+        [HTTopMost() presentViewController:ok animated:YES completion:nil];
+    }]];
+
     [sheet addAction:[UIAlertAction actionWithTitle:@"取消"
                                               style:UIAlertActionStyleCancel
                                             handler:nil]];
@@ -137,11 +163,18 @@ static void HTShowMenu(void) {
 // 路线 A：hook sendEvent，自己数手指
 //   优势：完全绕过手势系统，任何手势都抢不走
 // ---------------------------------------------------------------------------
-static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
-    // 先让系统正常处理
-    typedef void (*fn_t)(id, SEL, UIEvent *);
-    if (HTOrig_sendEvent) ((fn_t)HTOrig_sendEvent)(self, _cmd, event);
+static void HTProcessEvent(id sender, UIEvent *event);
+static IMP HTOrig_appSendEvent = NULL;
 
+// UIApplication 的 sendEvent: 是最终必经之路，比 UIWindow 更可靠
+static void HTAppSendEvent(id self, SEL _cmd, UIEvent *event) {
+    typedef void (*fn_t)(id, SEL, UIEvent *);
+    if (HTOrig_appSendEvent) ((fn_t)HTOrig_appSendEvent)(self, _cmd, event);
+    // 触摸逻辑抽到共用函数
+    HTProcessEvent(self, event);
+}
+
+static void HTProcessEvent(id sender, UIEvent *event) {
     if (!event) return;
 
     // UIEvent.type : 4 = touches（直接读 ivar，避免 objc_msgSend 类型问题）
@@ -217,7 +250,7 @@ static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
             }
 
             // 状态栏区域：顶部 60pt 内、水平居右 1/3（避开灵动岛/刘海）
-            UIWindow *w = (UIWindow *)self;
+            UIWindow *w = (UIWindow *)sender;
             CGFloat ww = w ? w.bounds.size.width : 390;
             if (p.y >= 0 && p.y <= 60 && p.x >= ww * 0.45 && p.x <= ww) {
                 if (gLastStatusTap > 0 && (now - gLastStatusTap) < 1.2) {
@@ -231,6 +264,12 @@ static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
             break;
         }
     }
+}
+
+static void HTSendEvent(id self, SEL _cmd, UIEvent *event) {
+    typedef void (*fn_t)(id, SEL, UIEvent *);
+    if (HTOrig_sendEvent) ((fn_t)HTOrig_sendEvent)(self, _cmd, event);
+    HTProcessEvent(self, event);
 }
 
 // ---------------------------------------------------------------------------
@@ -271,6 +310,17 @@ static void HeJiaUIInit(void) {
                 HTOrig_motionEnded = method_getImplementation(m2);
                 method_setImplementation(m2, (IMP)HTMotionEnded);
                 UI_LOG(@"路线C已就绪: hook -[UIWindow motionEnded:withEvent:]");
+            }
+        }
+
+        // 双保险：同时 hook UIApplication.sendEvent:（事件必经之路）
+        Class appCls = objc_getClass("UIApplication");
+        if (appCls) {
+            Method ma = class_getInstanceMethod(appCls, @selector(sendEvent:));
+            if (ma) {
+                HTOrig_appSendEvent = method_getImplementation(ma);
+                method_setImplementation(ma, (IMP)HTAppSendEvent);
+                UI_LOG(@"已 hook -[UIApplication sendEvent:]（双保险）");
             }
         }
 

@@ -151,7 +151,7 @@ enum { UIModalPresentationFormSheet = 2 };
 @interface UIAlertAction : NSObject
 + (instancetype)actionWithTitle:(NSString *)t style:(NSInteger)s handler:(void (^)(UIAlertAction *))h;
 @end
-enum { UIAlertActionStyleDefault = 0, UIAlertActionStyleCancel = 1 };
+enum { UIAlertActionStyleDefault = 0, UIAlertActionStyleCancel = 1, UIAlertActionStyleDestructive = 2 };
 
 @interface UIAlertController : UIViewController
 + (instancetype)alertControllerWithTitle:(NSString *)t message:(NSString *)m preferredStyle:(NSInteger)s;
