@@ -77,7 +77,7 @@ static const char *kNeverBlock[] = {
     NULL
 };
 
-static BOOL na_isAdURL(NSString *url) {
+__attribute__((unused)) static BOOL na_isAdURL(NSString *url) {
     if (![url isKindOfClass:[NSString class]]) return NO;
     const char *s = url.UTF8String;
     if (!s) return NO;
@@ -159,7 +159,7 @@ static BOOL na_isAppClass(Class c) {
 // --- NSURLSession dataTaskWithRequest:completionHandler: ---
 static IMP na_orig_dataTask = NULL;
 
-static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handler) {
+__attribute__((unused)) static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handler) {
     void (^h)(NSData *, NSURLResponse *, NSError *) = handler;
     if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
         NSString *u = [req.URL absoluteString];
@@ -322,7 +322,7 @@ static void na_patchAdDataGetters(void) {
 // ---------------------------------------------------------------------------
 static IMP na_orig_dataTaskReq = NULL;
 
-static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
+__attribute__((unused)) static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
     if (req && na_isEnabled()) {
         NSString *u = [req.URL absoluteString];
         if (na_isAdURL(u)) {
@@ -413,37 +413,13 @@ static void HeJiaNoAdsInit(void) {
     @autoreleasepool {
         NA_LOG(@"════ 广告屏蔽加载 ════");
 
-        // 网络层
-        Class NSURLSessionC = objc_getClass("NSURLSession");
-        if (NSURLSessionC) {
-            Method m = class_getInstanceMethod(NSURLSessionC,
-                        @selector(dataTaskWithRequest:completionHandler:));
-            if (m) {
-                na_orig_dataTask = method_getImplementation(m);
-                method_setImplementation(m, (IMP)na_dataTaskWithRequest);
-                NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:completionHandler:]");
-            }
-            // 关键：AFNetworking delegate 模式走这个
-            Method m2 = class_getInstanceMethod(NSURLSessionC,
-                          @selector(dataTaskWithRequest:));
-            if (m2) {
-                na_orig_dataTaskReq = method_getImplementation(m2);
-                method_setImplementation(m2, (IMP)na_dataTaskWithRequestOnly);
-                NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:]  <-- AF 路径");
-            }
-        }
-
-        // 缓存层
-        Class cacheCls = objc_getClass("NSURLCache");
-        if (cacheCls) {
-            Method cm = class_getInstanceMethod(cacheCls,
-                          @selector(cachedResponseForRequest:));
-            if (cm) {
-                na_orig_cachedResponse = method_getImplementation(cm);
-                method_setImplementation(cm, (IMP)na_cachedResponse);
-                NA_LOG(@"hook -[NSURLCache cachedResponseForRequest:]");
-            }
-        }
+        // ⚠️ 网络层拦截已整体移除
+        //    实测：拦掉广告接口后，广告 SDK 仍然会创建它自己的容器窗口
+        //    （level=1999、全屏、空视图、可交互），结果把整个 App 的触摸全吃掉，
+        //    表现为"哪里都点不了"，而摇一摇菜单（level 2000）却正常。
+        //    正确做法：不动数据，只在"展示层"把广告控件掐掉，另外由 WindowFix
+        //    兜底隐藏这种空窗口。
+        NA_LOG(@"网络层拦截已移除（它会制造空广告窗口挡住触摸）");
 
         // 只做最轻量的：总开关（几乎零成本）
         na_patchSwitch();
