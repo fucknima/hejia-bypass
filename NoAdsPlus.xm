@@ -100,6 +100,78 @@ static void np_patch_mcs_popups(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 3.6 设备网格里的广告卡片
+//     实测日志：首页出现 HYNewGDRBBannerCollectionViewCell /
+//     HYHardwareClassifyBannerDeviceListView_CN.SENSORSDATA，
+//     说明广告是混在"设备列表数据"里渲染的。
+//     这里只做两件事：把模型类名打进日志（供确认），以及剔除类名里
+//     明确带广告/推荐字样的模型 —— 匹配不到就不动，绝不误删设备。
+// ---------------------------------------------------------------------------
+static BOOL np_initedClsLog = NO;
+static BOOL np_isAdModel(id m) {
+    NSString *cn = NSStringFromClass([m class]);
+    if (![cn isKindOfClass:[NSString class]]) return NO;
+    return [cn containsString:@"Banner"] || [cn containsString:@"GDRB"] ||
+           [cn containsString:@"Recommend"] || [cn containsString:@"Promotion"] ||
+           [cn containsString:@"Advert"] || [cn containsString:@"AdCard"] ||
+           [cn containsString:@"AdModel"] || [cn containsString:@"Operation"];
+}
+
+static IMP np_orig_cfgDevices = NULL;
+static void np_cfgDevices(id self, SEL _cmd, NSArray *arr, long idx) {
+    typedef void (*fn_t)(id, SEL, NSArray *, long);
+    if (!np_initedClsLog && arr.count) {
+        np_initedClsLog = YES;
+        NSMutableArray *names = [NSMutableArray array];
+        NSUInteger n = arr.count > 10 ? 10 : arr.count;
+        for (NSUInteger i = 0; i < n; i++) [names addObject:NSStringFromClass([arr[i] class])];
+        NP_LOG(@"[dev] 列表模型(%lu): %@", (unsigned long)arr.count, [names description]);
+    }
+    NSMutableArray *kept = [NSMutableArray array];
+    int dropped = 0;
+    for (id m in arr) {
+        if (np_isAdModel(m)) { dropped++; continue; }
+        [kept addObject:m];
+    }
+    if (dropped) NP_LOG(@"[dev] 剔除广告模型 %d 个", dropped);
+    if (np_orig_cfgDevices) ((fn_t)np_orig_cfgDevices)(self, _cmd, kept, idx);
+}
+
+static IMP np_orig_cfgDevices2 = NULL;
+static void np_cfgDevices2(id self, SEL _cmd, NSArray *arr) {
+    typedef void (*fn_t)(id, SEL, NSArray *);
+    NSMutableArray *kept = [NSMutableArray array];
+    int dropped = 0;
+    for (id m in arr) {
+        if (np_isAdModel(m)) { dropped++; continue; }
+        [kept addObject:m];
+    }
+    if (dropped) NP_LOG(@"[dev2] 剔除广告模型 %d 个", dropped);
+    if (np_orig_cfgDevices2) ((fn_t)np_orig_cfgDevices2)(self, _cmd, kept);
+}
+
+static void np_patch_device_ads(void) {
+    Class c = objc_getClass("HYHardwareFamilyDeviceListView");
+    if (c) {
+        Method m = class_getInstanceMethod(c, sel_registerName("configWithAllDeviceArray:currentRoomIndex:"));
+        if (m) {
+            np_orig_cfgDevices = method_getImplementation(m);
+            method_setImplementation(m, (IMP)np_cfgDevices);
+            NP_LOG(@"[OK] HYHardwareFamilyDeviceListView.configWithAllDeviceArray:");
+        }
+    }
+    Class c2 = objc_getClass("HYHardwareClassifyBannerDeviceListView");
+    if (c2) {
+        Method m = class_getInstanceMethod(c2, sel_registerName("configWithAllDeviceArray:"));
+        if (m) {
+            np_orig_cfgDevices2 = method_getImplementation(m);
+            method_setImplementation(m, (IMP)np_cfgDevices2);
+            NP_LOG(@"[OK] HYHardwareClassifyBannerDeviceListView.configWithAllDeviceArray:");
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -190,6 +262,7 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_launch_ad();
         np_patch_own_ads();
         np_patch_mcs_popups();
+        np_patch_device_ads();
         if (np_banner_on()) {
             np_patch_banners();
         } else {

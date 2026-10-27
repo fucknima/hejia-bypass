@@ -101,6 +101,7 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
     [super viewDidLoad];
 
     self.title = @"工具箱";
+    self.edgesForExtendedLayout = 0;      // UIRectEdgeNone：内容从导航栏下方开始
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
 
     self.navigationItem.rightBarButtonItem =

@@ -19,6 +19,7 @@
 #import <objc/message.h>
 #import <math.h>
 #include <CoreFoundation/CoreFoundation.h>
+#include <unistd.h>
 
 #include <substrate.h>
 
@@ -34,6 +35,21 @@ extern "C" {
 // 状态
 // ---------------------------------------------------------------------------
 static IMP HTOrig_motionEnded = NULL;
+
+// 目录/文件大小（递归）
+static unsigned long long HTDirSize(NSString *path) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL isDir = NO;
+    unsigned long long total = 0;
+    if (![fm fileExistsAtPath:path isDirectory:&isDir]) return 0;
+    if (!isDir) {
+        NSDictionary *attr = [fm attributesOfItemAtPath:path error:NULL];
+        return attr ? [attr fileSize] : 0;
+    }
+    NSArray *items = [fm contentsOfDirectoryAtPath:path error:NULL];
+    for (NSString *it in items) total += HTDirSize([path stringByAppendingPathComponent:it]);
+    return total;
+}
 
 static const void *kHTMenuShowingKey = &kHTMenuShowingKey;
 
@@ -81,48 +97,75 @@ static void HTShowMenu(void) {
         [HTTopMost() presentViewController:nav animated:YES completion:nil];
     }]];
 
-    [sheet addAction:[UIAlertAction actionWithTitle:@"📄  复制日志路径"
-                                              style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction *a) {
-        (void)a;
-        const char *p = HTGetLogFilePath();
-        NSString *path = [NSString stringWithUTF8String:p ?: ""];
-        [UIPasteboard generalPasteboard].string = path;
-        UI_LOG(@"已复制日志路径");
-
-        UIAlertController *ok = [UIAlertController
-            alertControllerWithTitle:@"日志路径已复制"
-                             message:path
-                      preferredStyle:UIAlertControllerStyleAlert];
-        [ok addAction:[UIAlertAction actionWithTitle:@"好"
-                                               style:UIAlertActionStyleDefault
-                                             handler:nil]];
-        [HTTopMost() presentViewController:ok animated:YES completion:nil];
-    }]];
-
-    [sheet addAction:[UIAlertAction actionWithTitle:@"🧹  清理广告缓存"
+    [sheet addAction:[UIAlertAction actionWithTitle:@"🧹  清理全部数据"
                                               style:UIAlertActionStyleDestructive
                                             handler:^(UIAlertAction *a) {
         (void)a;
-        // 清 NSURLCache
-        NSURLCache *cache = [NSURLCache sharedURLCache];
-        [cache removeAllCachedResponses];
-        // 清用户默认值里的运营位缓存
+
+        NSFileManager *fm = [NSFileManager defaultManager];
+        unsigned long long freed = 0;
+        int files = 0;
+
+        // 1) Library/Caches
+        NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *caches = dirs.count ? dirs[0] : nil;
+        // 2) tmp
+        NSString *tmp = NSTemporaryDirectory();
+
+        for (NSString *dir in @[caches ?: @"", tmp ?: @""]) {
+            if (dir.length == 0) continue;
+            NSArray *items = [fm contentsOfDirectoryAtPath:dir error:NULL];
+            for (NSString *it in items) {
+                NSString *full = [dir stringByAppendingPathComponent:it];
+                freed += HTDirSize(full);
+                if ([fm removeItemAtPath:full error:NULL]) files++;
+            }
+        }
+
+        // 3) NSURLCache
+        [[NSURLCache sharedURLCache] removeAllCachedResponses];
+
+        // 4) 图片缓存（SDWebImage / YYWebImage，存在才清）
+        for (NSString *cn in @[@"SDImageCache", @"YYImageCache"]) {
+            Class c = objc_getClass([cn UTF8String]);
+            if (!c) continue;
+            id cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedImageCache"));
+            if (!cache) cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedCache"));
+            if (!cache) continue;
+            if ([cache respondsToSelector:sel_registerName("clearMemory")])
+                ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearMemory"));
+            if ([cache respondsToSelector:sel_registerName("clearDisk")])
+                ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearDisk"));
+        }
+
+        // 5) 自家运营位缓存键
         NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
         for (NSString *k in @[@"TabbarsDictCache", @"TabBarPageDictCacheKey",
                               @"shouldModifyTabbarInfoDict", @"ModifyTabbarInfoDict",
                               @"ModifyTabbarsDictForProvice"]) {
             [ud removeObjectForKey:k];
         }
-        UI_LOG(@"已清理广告/运营位缓存");
+        [ud synchronize];
+
+        UI_LOG(@"清理完成：%d 项，约 %llu KB", files, freed / 1024);
+
+        NSString *msg = [NSString stringWithFormat:
+            @"已删除 %d 个缓存项，释放约 %llu MB。\n重启 App 后生效。",
+            files, freed / (1024 * 1024)];
 
         UIAlertController *ok = [UIAlertController
-            alertControllerWithTitle:@"已清理"
-                             message:@"缓存已清除，请重启 App 生效"
+            alertControllerWithTitle:@"清理完成"
+                             message:msg
                       preferredStyle:UIAlertControllerStyleAlert];
-        [ok addAction:[UIAlertAction actionWithTitle:@"好"
-                                               style:UIAlertActionStyleDefault
+        [ok addAction:[UIAlertAction actionWithTitle:@"稍后"
+                                               style:UIAlertActionStyleCancel
                                              handler:nil]];
+        [ok addAction:[UIAlertAction actionWithTitle:@"立即重启"
+                                               style:UIAlertActionStyleDestructive
+                                             handler:^(UIAlertAction *x) {
+            (void)x;
+            _exit(0);
+        }]];
         [HTTopMost() presentViewController:ok animated:YES completion:nil];
     }]];
 

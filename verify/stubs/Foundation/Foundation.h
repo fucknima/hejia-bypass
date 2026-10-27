@@ -159,6 +159,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (BOOL)createDirectoryAtPath:(NSString *)p withIntermediateDirectories:(BOOL)i attributes:(id)a error:(id *)e;
 - (id)containerURLForSecurityApplicationGroupIdentifier:(NSString *)g;
 - (BOOL)removeItemAtPath:(NSString *)p error:(id *)e;
+- (NSArray *)contentsOfDirectoryAtPath:(NSString *)p error:(id *)e;
+- (NSDictionary *)attributesOfItemAtPath:(NSString *)p error:(id *)e;
 @end
 
 @interface NSBundle : NSObject
@@ -217,6 +219,9 @@ NSArray<NSString *> *NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory d
 - (NSString *)stringFromDate:(NSDate *)d;
 @end
 
+@interface NSDictionary (HTSize)
+- (unsigned long long)fileSize;
+@end
 #ifdef __cplusplus
 }
 #endif

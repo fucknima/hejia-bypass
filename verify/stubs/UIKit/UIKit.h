@@ -197,6 +197,7 @@ enum { UIBarButtonSystemItemDone = 0, UIBarButtonItemStylePlain = 0 };
 @property (nonatomic) NSInteger modalPresentationStyle;
 @property (nonatomic, readonly) id navigationController;
 @property (nonatomic, readonly) UIPopoverPresentationController *popoverPresentationController;
+@property (nonatomic) NSUInteger edgesForExtendedLayout;
 - (void)viewDidLoad;
 - (void)viewDidLayoutSubviews;
 - (void)presentViewController:(UIViewController *)vc animated:(BOOL)a completion:(void (^)(void))c;
