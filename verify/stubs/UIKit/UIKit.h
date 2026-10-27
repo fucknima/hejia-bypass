@@ -46,6 +46,10 @@ void CGContextSetLineWidth(CGContextRef c, CGFloat w);
 @end
 enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplate = 2 };
 
+@interface UIPopoverPresentationController : NSObject
+@property (nonatomic, strong) id sourceView;
+@property (nonatomic) CGRect sourceRect;
+@end
 @interface UIView : NSObject
 @property (nonatomic) CGRect frame;
 @property (nonatomic) CGRect bounds;
@@ -54,6 +58,8 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
+- (void)addGestureRecognizer:(id)g;
+- (void)removeGestureRecognizer:(id)g;
 @end
 
 @interface UIImageView : UIView
@@ -124,6 +130,7 @@ enum { UIBarButtonSystemItemDone = 0, UIBarButtonItemStylePlain = 0 };
 @property (nonatomic, strong) UIViewController *presentedViewController;
 @property (nonatomic) NSInteger modalPresentationStyle;
 @property (nonatomic, readonly) id navigationController;
+@property (nonatomic, readonly) UIPopoverPresentationController *popoverPresentationController;
 - (void)viewDidLoad;
 - (void)presentViewController:(UIViewController *)vc animated:(BOOL)a completion:(void (^)(void))c;
 - (void)dismissViewControllerAnimated:(BOOL)a completion:(void (^)(void))c;
@@ -134,13 +141,13 @@ enum { UIModalPresentationFormSheet = 2 };
 @interface UIAlertAction : NSObject
 + (instancetype)actionWithTitle:(NSString *)t style:(NSInteger)s handler:(void (^)(UIAlertAction *))h;
 @end
-enum { UIAlertActionStyleDefault = 0 };
+enum { UIAlertActionStyleDefault = 0, UIAlertActionStyleCancel = 1 };
 
 @interface UIAlertController : UIViewController
 + (instancetype)alertControllerWithTitle:(NSString *)t message:(NSString *)m preferredStyle:(NSInteger)s;
 - (void)addAction:(UIAlertAction *)a;
 @end
-enum { UIAlertControllerStyleAlert = 1 };
+enum { UIAlertControllerStyleActionSheet = 0, UIAlertControllerStyleAlert = 1 };
 
 @interface UITableViewController : UIViewController
 - (instancetype)initWithStyle:(NSInteger)s;
@@ -148,6 +155,7 @@ enum { UIAlertControllerStyleAlert = 1 };
 @end
 
 @interface UINavigationController : UIViewController
+@property (nonatomic, readonly) UIViewController *topViewController;
 @property (nonatomic, readonly) NSArray *viewControllers;
 - (instancetype)initWithRootViewController:(UIViewController *)vc;@end
 @interface UINavigationControllerX : UIViewController
@@ -171,6 +179,30 @@ enum { UIAlertControllerStyleAlert = 1 };
 + (instancetype)sharedApplication;
 @property (nonatomic, readonly) NSArray<UIWindow *> *windows;
 @property (nonatomic, readonly) UIWindow *keyWindow;
+@end
+
+
+@protocol UIGestureRecognizerDelegate
+@optional
+- (BOOL)gestureRecognizer:(id)g shouldRecognizeSimultaneouslyWithGestureRecognizer:(id)o;
+@end
+@interface UIGestureRecognizer : NSObject
+- (instancetype)initWithTarget:(id)t action:(SEL)a;
+@property (nonatomic, readonly) NSInteger state;
+@property (nonatomic, weak) id delegate;
+@property (nonatomic) BOOL cancelsTouchesInView;
+@property (nonatomic) BOOL delaysTouchesBegan;
+@property (nonatomic) BOOL delaysTouchesEnded;
+@end
+enum {
+    UIGestureRecognizerStateBegan = 1,
+    UIGestureRecognizerStateChanged = 2,
+    UIGestureRecognizerStateEnded = 3,
+    UIGestureRecognizerStateCancelled = 4,
+};
+@interface UILongPressGestureRecognizer : UIGestureRecognizer
+@property (nonatomic) NSInteger numberOfTouchesRequired;
+@property (nonatomic) double minimumPressDuration;
 @end
 
 #ifdef __cplusplus

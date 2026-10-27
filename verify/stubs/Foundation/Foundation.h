@@ -100,6 +100,9 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (V)objectForKeyedSubscript:(K)k;
 @end
 
+@interface NSValue : NSObject
++ (NSValue *)valueWithRect:(void *)r;
+@end
 @interface NSData : NSObject
 + (instancetype)dataWithBytes:(const void *)b length:(unsigned long)l;
 @end

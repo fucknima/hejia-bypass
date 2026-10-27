@@ -47,47 +47,44 @@ static const char *HTResolveDir(void) {
 
     @autoreleasepool {
         NSFileManager *fm = [NSFileManager defaultManager];
-        NSMutableArray *candidates = [NSMutableArray array];
 
-        // A. App Group（文件 App 可见的前提）
+        // 只写共享容器（App Group）——用户在签名时会开启文件共享
         NSURL *groupURL = [fm containerURLForSecurityApplicationGroupIdentifier:
                               [NSString stringWithUTF8String:GROUP_ID]];
+        NSString *chosen = nil;
         if (groupURL) {
-            [candidates addObject:[groupURL.path stringByAppendingPathComponent:@"HeJiaTool"]];
-        }
-
-        // B. Documents（若 Info.plist 开启文件共享则可见）
-        NSArray *docPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                                 NSUserDomainMask, YES);
-        if (docPaths.count > 0) {
-            [candidates addObject:[docPaths[0] stringByAppendingPathComponent:@"HeJiaTool"]];
-        }
-
-        // C. Caches 兜底
-        NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory,
-                                                                   NSUserDomainMask, YES);
-        if (cachePaths.count > 0) {
-            [candidates addObject:[cachePaths[0] stringByAppendingPathComponent:@"HeJiaTool"]];
-        }
-
-        NSString *chosen = candidates.count > 0 ? candidates[0] : NSTemporaryDirectory();
-        for (NSString *c in candidates) {
+            chosen = [groupURL.path stringByAppendingPathComponent:@"HeJiaTool"];
             NSError *e = nil;
-            if ([fm createDirectoryAtPath:c withIntermediateDirectories:YES
-                               attributes:nil error:&e]) {
-                // 探针：真能写才算数
-                NSString *probe = [c stringByAppendingPathComponent:@".probe"];
-                NSError *wErr = nil;
-                if ([@"ok" writeToFile:probe atomically:YES
-                              encoding:NSUTF8StringEncoding error:&wErr]) {
-                    NSError *rErr = nil;
-                    [fm removeItemAtPath:probe error:&rErr];
-                    (void)rErr;
-                    chosen = c;
-                    break;
-                }
-            } else {
+            if (![fm createDirectoryAtPath:chosen withIntermediateDirectories:YES
+                                attributes:nil error:&e]) {
                 (void)e;
+                chosen = groupURL.path;   // 直接放 group 根目录
+            }
+            // 探针：验证真能写
+            NSString *probe = [chosen stringByAppendingPathComponent:@".probe"];
+            NSError *wErr = nil;
+            if ([@"ok" writeToFile:probe atomically:YES
+                          encoding:NSUTF8StringEncoding error:&wErr]) {
+                NSError *rErr = nil;
+                [fm removeItemAtPath:probe error:&rErr];
+                (void)rErr;
+            } else {
+                chosen = nil;   // 写不进去就当不可用
+            }
+        }
+
+        // 共享容器不可用时的降级（仅记录，不指望文件 App 能看到）
+        if (!chosen) {
+            NSArray *docPaths = NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory, NSUserDomainMask, YES);
+            if (docPaths.count > 0) {
+                chosen = [docPaths[0] stringByAppendingPathComponent:@"HeJiaTool"];
+                NSError *dErr = nil;
+                [fm createDirectoryAtPath:chosen withIntermediateDirectories:YES
+                               attributes:nil error:&dErr];
+                (void)dErr;
+            } else {
+                chosen = NSTemporaryDirectory();
             }
         }
 
