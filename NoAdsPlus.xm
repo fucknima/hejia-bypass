@@ -192,6 +192,81 @@ static void np_patch_device_ads(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 3.7 我的页组件过滤（实测类名来自二进制类表）
+//     HYMyInfoCoreFunctionsComponent      → 我的钱包（零钱/银行卡/AI豆/号码借）
+//     HYMyInfoCircleOfRelativesComponent  → 爱家亲情网
+//     HYMyInfoComponentManager 只有一个方法，就是"把组件字典数组变成视图"，
+//     在这里剔除即可整块消失，不会留空。
+// ---------------------------------------------------------------------------
+static BOOL np_myinfoLogged = NO;
+static IMP np_orig_myinfo = NULL;
+
+static BOOL np_isBlockedComponent(id d) {
+    @try {
+        NSString *desc = [d description];
+        if (![desc isKindOfClass:[NSString class]]) return NO;
+        return [desc containsString:@"HYMyInfoCoreFunctionsComponent"] ||
+               [desc containsString:@"HYMyInfoCircleOfRelativesComponent"];
+    } @catch (NSException *e) { (void)e; }
+    return NO;
+}
+
+static id np_myinfoGetView(id self, SEL _cmd, NSArray *dicts, id tabId, id realTabId, id block) {
+    typedef id (*fn_t)(id, SEL, NSArray *, id, id, id);
+    if (!np_myinfoLogged && dicts.count) {
+        np_myinfoLogged = YES;
+        @try {
+            id first = dicts[0];
+            NP_LOG(@"[myinfo] count=%lu keys=%@", (unsigned long)dicts.count,
+                   [[first allKeys] description]);
+        } @catch (NSException *e) { (void)e; }
+    }
+
+    NSMutableArray *kept = [NSMutableArray array];
+    int dropped = 0;
+    for (id d in dicts) {
+        if (np_isBlockedComponent(d)) { dropped++; continue; }
+        [kept addObject:d];
+    }
+    if (dropped) NP_LOG(@"[myinfo] 剔除组件 %d 个（钱包/亲情网）", dropped);
+
+    return np_orig_myinfo ? ((fn_t)np_orig_myinfo)(self, _cmd, kept, tabId, realTabId, block) : nil;
+}
+
+static void np_patch_myinfo(void) {
+    Class c = objc_getClass("HYMyInfoComponentManager");
+    if (!c) return;
+    Method m = class_getInstanceMethod(c, sel_registerName("getViewWithComponentDictArray:tabId:realTabId:completeBlock:"));
+    if (!m) { NP_LOG(@"[myinfo] 方法未找到"); return; }
+    np_orig_myinfo = method_getImplementation(m);
+    method_setImplementation(m, (IMP)np_myinfoGetView);
+    NP_LOG(@"[OK] HYMyInfoComponentManager 组件过滤已启用");
+}
+
+// ---------------------------------------------------------------------------
+// 3.8 摄像头页广告条
+// ---------------------------------------------------------------------------
+static IMP np_orig_cncAdMove = NULL;
+static void np_cncAdMove(id self, SEL _cmd) {
+    typedef void (*fn_t)(id, SEL);
+    if (np_orig_cncAdMove) ((fn_t)np_orig_cncAdMove)(self, _cmd);
+    if (!((UIView *)self).hidden) {
+        ((UIView *)self).hidden = YES;
+        NP_LOG(@"[cnc] 隐藏 HYCNCAdBanner");
+    }
+}
+
+static void np_patch_cnc_ad(void) {
+    Class c = objc_getClass("HYCNCAdBanner");
+    if (!c) return;
+    Method m = class_getInstanceMethod(c, sel_registerName("didMoveToWindow"));
+    if (!m) return;
+    np_orig_cncAdMove = method_getImplementation(m);
+    method_setImplementation(m, (IMP)np_cncAdMove);
+    NP_LOG(@"[OK] HYCNCAdBanner 已接管");
+}
+
+// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -283,6 +358,8 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_own_ads();
         np_patch_mcs_popups();
         np_patch_device_ads();
+        np_patch_myinfo();
+        np_patch_cnc_ad();
         if (np_banner_on()) {
             np_patch_banners();
         } else {

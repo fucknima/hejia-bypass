@@ -225,6 +225,7 @@ NSArray<NSString *> *NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory d
 
 @interface NSDictionary (HTSize)
 - (unsigned long long)fileSize;
+- (NSArray *)allKeys;
 @end
 #ifdef __cplusplus
 }

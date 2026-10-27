@@ -20,6 +20,7 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import <math.h>
+#include <string.h>
 
 #include <substrate.h>
 
@@ -221,11 +222,12 @@ static void HTRepositionItems(UIView *tabBar) {
 
     // 2) 系统层（父视图是 UITabBar）
     UIView *parent = tabBar.superview;
-    Class btnCls = objc_getClass("UITabBarButton");
-    if (parent && btnCls) {
+    if (parent) {
         NSMutableArray *a = [NSMutableArray array];
-        for (UIView *v in parent.subviews)
-            if ([v isKindOfClass:btnCls]) [a addObject:v];
+        for (UIView *v in parent.subviews) {
+            const char *cn = class_getName(object_getClass(v));
+            if (cn && strstr(cn, "TabBarButton")) [a addObject:v];
+        }
         HTRepositionGroup(parent, a);
     }
 }
