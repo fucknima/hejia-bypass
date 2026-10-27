@@ -262,7 +262,7 @@ static void np_cncAdMove(id self, SEL _cmd) {
     }
 }
 
-__attribute__((unused)) static void np_patch_cnc_ad(void) {
+__attribute__((unused)) __attribute__((unused)) static void np_patch_cnc_ad(void) {
     Class c = objc_getClass("HYCNCAdBanner");
     if (!c) return;
     Method m = class_getInstanceMethod(c, sel_registerName("didMoveToWindow"));
@@ -309,7 +309,7 @@ __attribute__((unused)) static void np_patch_comp_log(void) {
 //     setIsClose: 写它 —— 这是 App 自带的"关闭该模块"开关。
 //     让 isClose 恒为 YES，它会按自己的逻辑整块收起，不留空档。
 // ---------------------------------------------------------------------------
-static void np_patch_scene_close(void) {
+__attribute__((unused)) static void np_patch_scene_close(void) {
     Class c = objc_getClass("HYHardwareBannerManager");
     if (!c) { NP_LOG(@"[MISS] HYHardwareBannerManager"); return; }
     Method m = class_getInstanceMethod(c, sel_registerName("isClose"));
