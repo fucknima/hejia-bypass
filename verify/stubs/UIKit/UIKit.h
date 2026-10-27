@@ -59,6 +59,7 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic) CGRect sourceRect;
 @end
 @interface UIView : NSObject
+@property (nonatomic, readonly) NSArray<UIView *> *subviews;
 @property (nonatomic) CGRect frame;
 @property (nonatomic) CGRect bounds;
 @property (nonatomic, readonly) UIView *superview;
@@ -80,6 +81,8 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 + (instancetype)buttonWithType:(NSInteger)t;
 - (void)setImage:(UIImage *)i forState:(NSUInteger)s;
 - (UIImage *)imageForState:(NSUInteger)s;
+- (NSString *)titleForState:(NSUInteger)s;
+- (void)setTitle:(NSString *)t forState:(NSUInteger)s;
 - (void)addTarget:(id)t action:(SEL)a forControlEvents:(NSUInteger)e;
 @property (nonatomic, readonly) UIImageView *imageView;
 @end
