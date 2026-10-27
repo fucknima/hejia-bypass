@@ -20,6 +20,7 @@ CGAffineTransform CGAffineTransformMakeTranslation(CGFloat tx, CGFloat ty);
 NSString *NSStringFromCGRect(CGRect r);
 NSString *NSStringFromClass(Class c);
 CGSize CGSizeMake(CGFloat w, CGFloat h);
+CGPoint CGPointMake(CGFloat x, CGFloat y);
 
 void UIGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale);
 void UIGraphicsEndImageContext(void);
@@ -82,6 +83,7 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
+- (UIView *)hitTest:(CGPoint)p withEvent:(id)e;
 - (void)setNeedsLayout;
 - (void)sendEvent:(UIEvent *)e;
 - (void)motionEnded:(NSInteger)subtype withEvent:(UIEvent *)e;

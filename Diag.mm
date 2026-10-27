@@ -71,9 +71,26 @@ static void HTDumpHierarchy(void) {
               (int)w.hidden, (double)w.windowLevel,
               NSStringFromClass([w.rootViewController class]));
     }
+    // 每个窗口都在触点 (235,861) 上做一次 hitTest，直接看谁接得住
+    CGPoint probe = CGPointMake(235, 861);
+    for (UIWindow *w in wins) {
+        UIViewController *r = w.rootViewController;
+        UIViewController *top = r;
+        if ([r isKindOfClass:[UINavigationController class]])
+            top = [(UINavigationController *)r topViewController];
+        D_LOG(@"WINHIT %@ level=%.0f h=%d root=%@ top=%@ nsub=%lu -> %@",
+              NSStringFromClass([w class]), (double)w.windowLevel, (int)w.hidden,
+              NSStringFromClass([r class]), NSStringFromClass([top class]),
+              (unsigned long)w.subviews.count,
+              NSStringFromClass([ [w hitTest:probe withEvent:nil] class ]));
+    }
+
     D_LOG(@"==== keyWindow tree ====");
-    UIWindow *win = [UIApplication sharedApplication].keyWindow;
-    if (win) HTDumpTree(win, 0, &budget);
+    for (UIWindow *w in wins) {
+        D_LOG(@"---- tree of %@ level=%.0f ----", NSStringFromClass([w class]), (double)w.windowLevel);
+        int b = 40;
+        HTDumpTree(w, 0, &b);
+    }
     D_LOG(@"==== tree end (budget=%d) ====", budget);
 }
 
