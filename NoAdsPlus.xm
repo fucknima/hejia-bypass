@@ -228,6 +228,12 @@ static id np_myinfoGetView(id self, SEL _cmd, NSArray *dicts, id tabId, id realT
         if (np_isBlockedComponent(d)) { dropped++; continue; }
         [kept addObject:d];
     }
+    if (kept.count == 0) {          // 保险：绝不能把整个页面清空
+        NP_LOG(@"[myinfo] 过滤后为空，回退原数组");
+        kept = [NSMutableArray array];
+        for (id dd in dicts) [kept addObject:dd];
+        dropped = 0;
+    }
     if (dropped) NP_LOG(@"[myinfo] 剔除组件 %d 个（钱包/亲情网）", dropped);
 
     return np_orig_myinfo ? ((fn_t)np_orig_myinfo)(self, _cmd, kept, tabId, realTabId, block) : nil;
@@ -448,7 +454,7 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_own_ads();
         np_patch_mcs_popups();
         np_patch_device_ads();
-        np_patch_myinfo();
+        // np_patch_myinfo();  // 停用：我的页/第二屏黑屏，先把组件数组还给原样
         np_patch_cnc_ad();
         np_patch_scene_close();
         // np_patch_comp_filter();  // 组件过滤（启发式）暂停：它 hook 的是首页组件构建入口，风险最高
