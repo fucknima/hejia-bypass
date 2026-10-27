@@ -12,6 +12,11 @@ typedef struct CGContext *CGContextRef;
 extern const CGPoint CGPointZero;
 
 CGRect CGRectMake(CGFloat x, CGFloat y, CGFloat w, CGFloat h);
+typedef struct { CGFloat a, b, c, d; CGFloat tx, ty; } CGAffineTransform;
+CGAffineTransform CGAffineTransformMakeTranslation(CGFloat tx, CGFloat ty);
+@class NSString;
+NSString *NSStringFromCGRect(CGRect r);
+NSString *NSStringFromClass(Class c);
 CGSize CGSizeMake(CGFloat w, CGFloat h);
 
 void UIGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale);
@@ -63,7 +68,9 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic) CGRect frame;
 @property (nonatomic) CGRect bounds;
 @property (nonatomic) CGPoint center;
+@property (nonatomic) CGAffineTransform transform;
 @property (nonatomic, readonly) UIView *superview;
+@property (nonatomic, readonly) id window;
 @property (nonatomic) BOOL hidden;
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;

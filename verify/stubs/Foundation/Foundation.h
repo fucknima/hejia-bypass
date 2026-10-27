@@ -12,6 +12,8 @@ typedef signed char BOOL;
 #define nil ((id)0)
 
 typedef long NSInteger;
+typedef double CFTimeInterval;
+extern CFTimeInterval CFAbsoluteTimeGetCurrent(void);
 typedef unsigned long NSUInteger;
 typedef unsigned long NSStringEncoding;
 static const NSStringEncoding NSUTF8StringEncoding = 4;
