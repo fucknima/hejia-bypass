@@ -1,16 +1,19 @@
 // ============================================================================
-//  Tab 隐藏模块 v6 —— 布局路径只做「便宜」的事，AI 扫描交给定时器
+//  Tab 隐藏模块 v7 —— 回到实测不卡的做法（v3），AI 只按类名精确摘除
 //  Bundle: com.cmcc.zhihuiguanjia
 // ----------------------------------------------------------------------------
-//  复盘（v4/v5 实测问题）：
-//    · 把「遍历整窗找 AI」放在 layoutSubviews 里 → 主线程被拖住，界面点不动
-//    · 而且那一刻 tabBar.window 经常还是 nil，扫描直接空转，所以 AI 一直没掉
-//    · 位置调整（center/transform）放在 layoutSubviews 里有回环风险
+//  复盘：
+//    v3（只遍历 tabBar.subviews + hidden）实测**不卡**，只是留空档；
+//    v4 起改用 [HYTabBar itemsAtIndex:] 后开始"哪里都点不了" ——
+//    这个方法在 layoutSubviews 期间调用会反过来触发布局（懒建 item），回环。
+//    v6 的 AI 文字扫描还会把「含 AI灵犀 的祖先视图」一并隐藏，
+//    结果整条 tab bar 被它的父容器带走了（截图：低栏全空）。
 //
-//  v6 的分工：
-//    layoutSubviews（高频）: 只做 items 收集 + 按文字 hidden + transform 平移（幂等）
-//    定时器（+1.5s / +4s / +8s）: 才遍历窗口找 AI（此时 window 一定存在）
-//    任何异常都被 @try 包住，且布局看门狗仍在
+//  v7 原则：
+//    1) layoutSubviews 里只做 v3 那套：遍历 subviews、按文字 hidden。不碰 itemsAtIndex:
+//    2) 不做任何几何重排（transform/center 全部去掉）——稳定优先
+//    3) AI 只在定时器里、只按**类名**摘除（AIBubble / AIBannerBubble / AIRemind / LingXi），
+//       绝不做"含文字的祖先视图"这种模糊匹配
 // ============================================================================
 
 #import <Foundation/Foundation.h>
@@ -34,14 +37,9 @@ static __thread BOOL gInTabLayout = NO;
 static BOOL gTabDisabled = NO;
 static CFTimeInterval gLastLayoutTime = 0;
 static int gLayoutBurst = 0;
-static BOOL gDumped = NO;
 
-@protocol HTTabBarItems
-- (id)itemsAtIndex:(NSUInteger)index;
-- (NSUInteger)itemsCount;
-- (NSUInteger)specialIndex;
-@end
-
+// ---------------------------------------------------------------------------
+// 递归：视图子树里是否有这个文字
 // ---------------------------------------------------------------------------
 static BOOL HTViewHasText(id view, NSString *text, int depth) {
     if (!view || depth > 6 || !text) return NO;
@@ -63,169 +61,42 @@ static BOOL HTViewHasText(id view, NSString *text, int depth) {
     return NO;
 }
 
-
-static void HTCollectItems(UIView *tabBar, NSMutableArray *out) {
-    if ([tabBar respondsToSelector:@selector(itemsAtIndex:)] &&
-        [tabBar respondsToSelector:@selector(itemsCount)]) {
-        id<HTTabBarItems> bar = (id<HTTabBarItems>)tabBar;
-        NSUInteger n = 0;
-        @try { n = [bar itemsCount]; } @catch (NSException *e) { (void)e; n = 0; }
-        if (n > 64) n = 0;
-        for (NSUInteger i = 0; i < n; i++) {
-            @try {
-                UIView *it = (UIView *)[bar itemsAtIndex:i];
-                if (it && [it isKindOfClass:[UIView class]]) [out addObject:it];
-            } @catch (NSException *e) { (void)e; }
-        }
-    }
-    if (out.count == 0) {
-        Class c1 = objc_getClass("HYTabBarItem");
-        Class c2 = objc_getClass("HYBaseTabBarItem");
-        for (UIView *v in tabBar.subviews) {
-            if ((c1 && [v isKindOfClass:c1]) || (c2 && [v isKindOfClass:c2])) [out addObject:v];
-        }
-    }
-}
-
 // ---------------------------------------------------------------------------
-// AI：只在定时器里调用（window 已就绪）
+// v3 原版：只遍历 tabBar 的直接子视图
 // ---------------------------------------------------------------------------
-static int HTHideAI(UIView *tabBar, NSArray *items) {
-    int hidden = 0;
-
-    // 1) specialIndex 指向的 item
-    if ([tabBar respondsToSelector:@selector(specialIndex)]) {
-        NSUInteger idx = 0;
-        @try { idx = [(id<HTTabBarItems>)tabBar specialIndex]; } @catch (NSException *e) { (void)e; }
-        if (idx < items.count) {
-            UIView *it = items[idx];
-            if (it && !it.hidden) { it.hidden = YES; hidden++; TAB_LOG(@"AI: specialIndex=%lu", (unsigned long)idx); }
-        }
-    }
-
-    // 2) customerizeItems
-    @try {
-        id cust = [tabBar valueForKey:@"customerizeItems"];
-        if ([cust isKindOfClass:[NSArray class]]) {
-            for (id v in (NSArray *)cust) {
-                if ([v isKindOfClass:[UIView class]] && !((UIView *)v).hidden) {
-                    ((UIView *)v).hidden = YES; hidden++;
-                    TAB_LOG(@"AI: customerizeItem %@", NSStringFromClass([v class]));
-                }
-            }
-        }
-    } @catch (NSException *e) { (void)e; }
-
-    // 3) 整窗扫类名 + 最内层「AI灵犀」
-    UIWindow *win = tabBar.window;
-    if (!win) {
-        for (UIWindow *w in [UIApplication sharedApplication].windows) { win = w; break; }
-    }
-    if (!win) win = [UIApplication sharedApplication].keyWindow;
-    if (!win) { TAB_LOG(@"AI: 拿不到窗口，跳过本轮"); return hidden; }
-
-    NSMutableArray *stack = [NSMutableArray array];
-    [stack addObject:win];
-    int guard = 0;
-    NSMutableArray *byText = [NSMutableArray array];
-    while (stack.count > 0 && guard++ < 5000) {
-        UIView *v = [stack lastObject];
-        [stack removeLastObject];
-
-        NSString *cn = NSStringFromClass([v class]);
-        if (!v.hidden &&
-            ([cn containsString:@"AIBubble"] || [cn containsString:@"AIBannerBubble"] ||
-             [cn containsString:@"AIRemind"] || [cn containsString:@"LingXi"])) {
-            v.hidden = YES; hidden++;
-            TAB_LOG(@"AI: 类名命中 %@", cn);
-        }
-        if (HTViewHasText(v, @"AI灵犀", 0)) [byText addObject:v];
-        for (UIView *s in v.subviews) [stack addObject:s];
-    }
-    for (UIView *v in byText) {
-        if (!v.hidden && v != tabBar && ![v isKindOfClass:[UIWindow class]]) {
-            v.hidden = YES; hidden++;
-            TAB_LOG(@"AI: 文字命中 %@", NSStringFromClass([v class]));
-        }
-    }
-    return hidden;
-}
-
-// ---------------------------------------------------------------------------
-// 主逻辑（doAI=NO 时只做便宜的部分）
-// ---------------------------------------------------------------------------
-static void HTApplyTabBar(UIView *tabBar, BOOL doAI) {
+static void HTHideTabItems(UIView *tabBar) {
     if (!tabBar) return;
 
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     BOOL hideService = [ud boolForKey:kHideServiceKey];
     BOOL hideFind    = [ud boolForKey:kHideFindKey];
-    BOOL hideAI      = [ud boolForKey:kHideAIKey];
-    if (!hideService && !hideFind && !hideAI) return;
+    if (!hideService && !hideFind) return;
 
-    NSMutableArray *items = [NSMutableArray array];
-    HTCollectItems(tabBar, items);
-    if (items.count < 2) return;
+    NSMutableArray *targets = [NSMutableArray array];
+    if (hideService) [targets addObject:@"服务"];
+    if (hideFind)    [targets addObject:@"发现"];
 
-    if (!gDumped) {
-        gDumped = YES;
-        NSString *d = @"";
-        for (UIView *v in tabBar.subviews) {
-            d = [d stringByAppendingString:
-                    [NSString stringWithFormat:@"%@(h%d) ",
-                        NSStringFromClass([v class]), (int)v.hidden]];
-        }
-        TAB_LOG(@"tabBar=%@ items=%lu subs=%@", NSStringFromClass([tabBar class]),
-                (unsigned long)items.count, d);
-    }
+    NSArray *subs = tabBar.subviews;
+    if (!subs || subs.count == 0) return;
 
-    if (doAI && hideAI) {
-        int n = HTHideAI(tabBar, items);
-        if (n > 0) TAB_LOG(@"AI 本轮命中 %d", n);
-    }
+    for (UIView *sub in subs) {
+        NSString *cn = NSStringFromClass([sub class]);
+        if ([cn containsString:@"ImageView"]) continue;   // 跳过背景图
 
-    // 隐藏「服务」「发现」
-    NSMutableArray *visible = [NSMutableArray array];
-    for (UIView *it in items) {
-        if (it.hidden) continue;
-        BOOL hide = NO;
-        if (hideService && HTViewHasText(it, @"服务", 0)) hide = YES;
-        if (!hide && hideFind && HTViewHasText(it, @"发现", 0)) hide = YES;
-        if (hide) {
-            it.hidden = YES;
-            TAB_LOG(@"隐藏 tab item：%@", (hideService && HTViewHasText(it, @"服务", 0)) ? @"服务" : @"发现");
-            continue;
-        }
-        [visible addObject:it];
-    }
-
-    // 几何重排只在定时器路径做（doAI），绝不放在 layoutSubviews 里
-    if (!doAI) return;
-    if (visible.count == 0 || visible.count >= items.count) return;
-
-    NSUInteger vn = visible.count;
-    for (NSUInteger i = 1; i < vn; i++) {
-        UIView *key = visible[i];
-        NSInteger j = (NSInteger)i - 1;
-        while (j >= 0 && ((UIView *)visible[(NSUInteger)j]).center.x > key.center.x) {
-            visible[(NSUInteger)(j + 1)] = visible[(NSUInteger)j];
-            j--;
-        }
-        visible[(NSUInteger)(j + 1)] = key;
-    }
-
-    CGFloat w = tabBar.bounds.size.width;
-    if (w <= 1) return;
-
-    for (NSUInteger k = 0; k < vn; k++) {
-        UIView *it = visible[k];
-        CGFloat dx = w * ((CGFloat)k + 0.5f) / (CGFloat)vn - it.center.x;
-        if (fabs(it.transform.tx - dx) > 0.5f) {
-            it.transform = CGAffineTransformMakeTranslation(dx, 0);
+        for (NSString *t in targets) {
+            if (HTViewHasText(sub, t, 0)) {
+                if (!sub.hidden) {
+                    sub.hidden = YES;
+                    TAB_LOG(@"已隐藏 Tab 按钮：%@", t);
+                }
+                break;
+            }
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// hook layoutSubviews（只做隐藏，不做任何几何操作）
 // ---------------------------------------------------------------------------
 static void HTTabBarLayout(id self, SEL _cmd) {
     typedef void (*fn_t)(id, SEL);
@@ -247,12 +118,51 @@ static void HTTabBarLayout(id self, SEL _cmd) {
 
     if (gInTabLayout) return;
     gInTabLayout = YES;
-    @try { HTApplyTabBar((UIView *)self, NO); } @catch (NSException *e) { TAB_LOG(@"布局异常：%@", e.reason); }
+    @try { HTHideTabItems((UIView *)self); } @catch (NSException *e) { TAB_LOG(@"布局异常：%@", e.reason); }
     gInTabLayout = NO;
 }
 
 // ---------------------------------------------------------------------------
-static void HTScanAllBars(BOOL doAI) {
+// AI：只按类名，定时器里跑（window 已就绪）
+// ---------------------------------------------------------------------------
+static void HTHideAIByClass(void) {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    if (![ud boolForKey:kHideAIKey]) return;
+
+    UIWindow *win = nil;
+    for (UIWindow *w in [UIApplication sharedApplication].windows) {
+        if (w.isKeyWindow) { win = w; break; }
+    }
+    if (!win) win = [UIApplication sharedApplication].keyWindow;
+    if (!win) return;
+
+    NSMutableArray *stack = [NSMutableArray array];
+    [stack addObject:win];
+    int guard = 0, n = 0;
+    while (stack.count > 0 && guard++ < 5000) {
+        UIView *v = [stack lastObject];
+        [stack removeLastObject];
+
+        if (!v.hidden) {
+            NSString *cn = NSStringFromClass([v class]);
+            CGSize sz = v.bounds.size;
+            BOOL small = (sz.width > 0 && sz.width <= 280 && sz.height <= 280);
+            if (small && ([cn containsString:@"AIBubble"] ||
+                [cn containsString:@"AIBannerBubble"] ||
+                [cn containsString:@"AIRemind"] ||
+                [cn containsString:@"LingXi"])) {
+                v.hidden = YES;
+                n++;
+                TAB_LOG(@"AI 隐藏：%@", cn);
+            }
+        }
+        for (UIView *s in v.subviews) [stack addObject:s];
+    }
+    if (n > 0) TAB_LOG(@"AI 本轮隐藏 %d 个视图", n);
+}
+
+// ---------------------------------------------------------------------------
+static void HTScanAllBars(void) {
     UIWindow *win = nil;
     for (UIWindow *w in [UIApplication sharedApplication].windows) {
         if (w.isKeyWindow) { win = w; break; }
@@ -269,7 +179,7 @@ static void HTScanAllBars(BOOL doAI) {
     while (stack.count > 0 && guard++ < 5000) {
         UIView *v = [stack lastObject];
         [stack removeLastObject];
-        if ([v isKindOfClass:barCls]) { HTApplyTabBar(v, doAI); found++; }
+        if ([v isKindOfClass:barCls]) { HTHideTabItems(v); found++; }
         for (UIView *s in v.subviews) [stack addObject:s];
     }
     if (found == 0) TAB_LOG(@"窗口里没找到 HYTabBar");
@@ -278,7 +188,18 @@ static void HTScanAllBars(BOOL doAI) {
 __attribute__((constructor))
 static void HeJiaTabInit(void) {
     @autoreleasepool {
-        TAB_LOG(@"════ Tab 模块 v6 加载 ════");
+        TAB_LOG(@"════ Tab 模块 v7 加载（稳定版：只隐藏，不重排）════");
+
+        // 一次性迁移：配置版本变化时把三个 Tab 开关复位为关，
+        // 保证"装上新版先能正常用"，再让用户按需打开。
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        id ver = [ud objectForKey:@"HeJiaTool_TabVer"];
+        if (![ver isKindOfClass:[NSString class]] || ![(NSString *)ver isEqualToString:@"7"]) {
+            // 只复位 AI：服务/发现 的隐藏在前几版已实测不卡，保持不变
+            [ud setBool:NO forKey:kHideAIKey];
+            [ud setObject:@"7" forKey:@"HeJiaTool_TabVer"];
+            TAB_LOG(@"配置版本升级：AI 开关已重置为关（需要时到工具箱再打开）");
+        }
 
         int hooked = 0;
         const char *barNames[] = { "HYTabBar", "HYCustomTabBar", NULL };
@@ -297,18 +218,17 @@ static void HeJiaTabInit(void) {
         [[NSNotificationCenter defaultCenter]
             addObserverForName:@"HeJiaTool_TabbarReload" object:nil
                          queue:[NSOperationQueue mainQueue]
-                    usingBlock:^(id note) { (void)note; HTScanAllBars(YES); }];
+                    usingBlock:^(id note) { (void)note; HTScanAllBars(); HTHideAIByClass(); }];
 
-        // 关键：AI 扫描放在窗口就绪之后，而不是 layoutSubviews 里
         const int64_t delays[] = { 1500, 4000, 8000, 15000, 25000 };
         for (int i = 0; i < 5; i++) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delays[i] * 1000000LL),
                            dispatch_get_main_queue(), ^{
-                @try { HTScanAllBars(YES); } @catch (NSException *e) { (void)e; }
+                @try { HTScanAllBars(); HTHideAIByClass(); } @catch (NSException *e) { (void)e; }
             });
         }
 
-        TAB_LOG(@"════ Tab 模块 v6 完成 ════");
+        TAB_LOG(@"════ Tab 模块 v7 完成 ════");
     }
 }
 
