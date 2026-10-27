@@ -75,16 +75,16 @@ static void np_patch_launch_ad(void) {
 // ---------------------------------------------------------------------------
 // 2. 自家广告位 / 推广消息
 // ---------------------------------------------------------------------------
-static void np_patch_own_ads(void) {
-    np_hook("McsAdvertsModuleService", "fetchAdvertNewReq:block:", (IMP)np_v2);
-    np_hook("HYOperationPromotedManager",
-            "getOperationPromotedViewWithCallBack:",              (IMP)np_v1);
+__attribute__((unused)) static void np_patch_own_ads(void) {
+    // 这两个涉及 block 回调 / 返回视图，先停用（可能让页面等不到回调而空白）
+    // np_hook("McsAdvertsModuleService", "fetchAdvertNewReq:block:", (IMP)np_v2);
+    // np_hook("HYOperationPromotedManager", "getOperationPromotedViewWithCallBack:", (IMP)np_v1);
 }
 
 // ---------------------------------------------------------------------------
 // 3. MCS 弹窗（首页/相册/文件页的“推广”大头）
 // ---------------------------------------------------------------------------
-static void np_patch_mcs_popups(void) {
+__attribute__((unused)) static void np_patch_mcs_popups(void) {
     np_hook("McsMemberAdManager",           "showMemberFreeFlowPopup", (IMP)np_v0);
     np_hook("McsMemBerAdPopupView",         "showMcsAdPopupView",      (IMP)np_v0);
 
@@ -451,12 +451,11 @@ static void HeJiaNoAdsPlusInit(void) {
         NP_LOG(@"════ NoAdsPlus 加载 ════");
 
         np_patch_launch_ad();
-        np_patch_own_ads();
-        np_patch_mcs_popups();
+        // np_patch_mcs_popups();   // 涉及请求回调，暂停
         np_patch_device_ads();
         // np_patch_myinfo();  // 停用：我的页/第二屏黑屏，先把组件数组还给原样
-        np_patch_cnc_ad();
-        np_patch_scene_close();
+        // np_patch_cnc_ad();      // 暂停
+        // np_patch_scene_close(); // 暂停
         // np_patch_comp_filter();  // 组件过滤（启发式）暂停：它 hook 的是首页组件构建入口，风险最高
         if (np_banner_on()) {
             np_patch_banners();

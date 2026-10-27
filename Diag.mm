@@ -103,6 +103,22 @@ static void HTDiagHeartbeat(void) {
                    dispatch_get_main_queue(), ^{ HTDiagHeartbeat(); });
 }
 
+// 页面追踪：哪个 VC 出现、是否真的显示了 view
+static IMP gOrigAppear = NULL;
+static void HTDiagAppear(id self, SEL _cmd, BOOL animated) {
+    typedef void (*fn_t)(id, SEL, BOOL);
+    if (gOrigAppear) ((fn_t)gOrigAppear)(self, _cmd, animated);
+    @try {
+        UIView *v = ((UIViewController *)self).view;
+        D_LOG(@"[VC] %@  view=%@ hidden=%d alpha=%.2f sub=%lu",
+              NSStringFromClass([self class]),
+              v ? NSStringFromClass([v class]) : @"nil",
+              v ? (int)v.hidden : -1,
+              v ? (double)v.alpha : -1,
+              v ? (unsigned long)v.subviews.count : 0);
+    } @catch (NSException *e) { (void)e; }
+}
+
 __attribute__((constructor))
 static void HTDiagInit(void) {
     @autoreleasepool {
@@ -118,6 +134,14 @@ static void HTDiagInit(void) {
             } else {
                 D_LOG(@"没找到 hitTest:withEvent:");
             }
+        }
+
+        Method ma = class_getInstanceMethod(objc_getClass("UIViewController"),
+                                             sel_registerName("viewDidAppear:"));
+        if (ma) {
+            gOrigAppear = method_getImplementation(ma);
+            method_setImplementation(ma, (IMP)HTDiagAppear);
+            D_LOG(@"VC 追踪已开启");
         }
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
