@@ -298,6 +298,65 @@ __attribute__((unused)) static void np_patch_comp_log(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 3.95 首页「场景/产品图册」整块
+//     反汇编确认：HYHardwareBannerManager -isClose 只读一个字节 ivar，
+//     setIsClose: 写它 —— 这是 App 自带的"关闭该模块"开关。
+//     让 isClose 恒为 YES，它会按自己的逻辑整块收起，不留空档。
+// ---------------------------------------------------------------------------
+static void np_patch_scene_close(void) {
+    Class c = objc_getClass("HYHardwareBannerManager");
+    if (!c) { NP_LOG(@"[MISS] HYHardwareBannerManager"); return; }
+    Method m = class_getInstanceMethod(c, sel_registerName("isClose"));
+    if (!m) { NP_LOG(@"[MISS] isClose"); return; }
+    method_setImplementation(m, (IMP)np_yes);
+    NP_LOG(@"[OK] HYHardwareBannerManager.isClose -> YES（场景/图册整块收起）");
+}
+
+// ---------------------------------------------------------------------------
+// 3.96 通用组件过滤（首页/工具区这类服务端下发组件）
+//     只在组件字典 -> 视图 之前剔除，类名/字段带广告字样的才丢，全程记录
+// ---------------------------------------------------------------------------
+static BOOL np_isAdComponent(id d) {
+    @try {
+        NSString *desc = [d description];
+        if (![desc isKindOfClass:[NSString class]]) return NO;
+        return [desc containsString:@"BigSale"] || [desc containsString:@"Banner"] ||
+               [desc containsString:@"Market"] || [desc containsString:@"Promotion"] ||
+               [desc containsString:@"Promoted"] || [desc containsString:@"Advert"] ||
+               [desc containsString:@"Operation"] || [desc containsString:@"Tool"];
+    } @catch (NSException *e) { (void)e; }
+    return NO;
+}
+
+__attribute__((unused)) static id np_compFilter(id self, SEL _cmd, NSArray *dicts, id tabId, id block) {
+    typedef id (*fn_t)(id, SEL, NSArray *, id, id);
+    NSMutableArray *kept = [NSMutableArray array];
+    int dropped = 0;
+    for (id d in dicts) {
+        if (np_isAdComponent(d)) {
+            dropped++;
+            @try { NP_LOG(@"[comp-drop] %@", [d description]); }
+            @catch (NSException *e) { (void)e; }
+            continue;
+        }
+        [kept addObject:d];
+    }
+    if (dropped) NP_LOG(@"[comp] 剔除 %d 个广告/推广组件，剩余 %lu",
+                        dropped, (unsigned long)kept.count);
+    return np_orig_compGet ? ((fn_t)np_orig_compGet)(self, _cmd, kept, tabId, block) : nil;
+}
+
+__attribute__((unused)) static void np_patch_comp_filter(void) {
+    Class c = objc_getClass("HYComponentManager");
+    if (!c) return;
+    Method m = class_getInstanceMethod(c, sel_registerName("getViewWithComponentDictArray:tabId:completeBlock:"));
+    if (!m) return;
+    np_orig_compGet = method_getImplementation(m);
+    method_setImplementation(m, (IMP)np_compFilter);
+    NP_LOG(@"[OK] HYComponentManager 组件过滤已启用");
+}
+
+// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -389,11 +448,10 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_own_ads();
         np_patch_mcs_popups();
         np_patch_device_ads();
-        // ⚠️ 以下三项在 15:55 那次实测出现整屏黑屏，已停用（代码保留，确认原因后再开）
-        // np_patch_myinfo();     // 我的页组件过滤
-        // np_patch_cnc_ad();     // 摄像头广告条隐藏
-        // np_patch_comp_log();   // 首页组件日志
-        NP_LOG(@"[SKIP] myinfo/cnc/comp 三项已停用（黑屏排查）");
+        np_patch_myinfo();
+        np_patch_cnc_ad();
+        np_patch_scene_close();
+        np_patch_comp_filter();
         if (np_banner_on()) {
             np_patch_banners();
         } else {

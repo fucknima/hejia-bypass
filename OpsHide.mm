@@ -32,7 +32,7 @@ static const char *kOpsClasses[] = {
 
 static BOOL HTOpsOn(void) {
     id v = [[NSUserDefaults standardUserDefaults] objectForKey:kNoOpsKey];
-    return v ? [v boolValue] : YES;     // 默认开启（广告优先）
+    return v ? [v boolValue] : NO;      // 默认关闭：改用 isClose 整块收起，避免空洞
 }
 
 static void HTHideOpsOnce(void) {
