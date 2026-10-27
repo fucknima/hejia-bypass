@@ -222,8 +222,12 @@ enum { UIAlertControllerStyleActionSheet = 0, UIAlertControllerStyleAlert = 1 };
 @property (nonatomic, readonly) UITableView *tableView;
 @end
 
+@interface UINavigationBar : UIView
+@property (nonatomic) BOOL translucent;
+@end
 @interface UINavigationController : UIViewController
 @property (nonatomic, readonly) UIViewController *topViewController;
+@property (nonatomic, readonly) UINavigationBar *navigationBar;
 @property (nonatomic, readonly) NSArray *viewControllers;
 - (instancetype)initWithRootViewController:(UIViewController *)vc;
 - (void)pushViewController:(UIViewController *)vc animated:(BOOL)a;@end

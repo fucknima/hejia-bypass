@@ -122,10 +122,18 @@ static void np_cfgDevices(id self, SEL _cmd, NSArray *arr, long idx) {
     typedef void (*fn_t)(id, SEL, NSArray *, long);
     if (!np_initedClsLog && arr.count) {
         np_initedClsLog = YES;
-        NSMutableArray *names = [NSMutableArray array];
-        NSUInteger n = arr.count > 10 ? 10 : arr.count;
-        for (NSUInteger i = 0; i < n; i++) [names addObject:NSStringFromClass([arr[i] class])];
-        NP_LOG(@"[dev] 列表模型(%lu): %@", (unsigned long)arr.count, [names description]);
+        NSUInteger n = arr.count > 8 ? 8 : arr.count;
+        for (NSUInteger i = 0; i < n; i++) {
+            id m = arr[i];
+            NSString *info = @"kvc-fail";
+            @try {
+                info = [NSString stringWithFormat:@"type=%@ cat=%@ desc=%@ rid=%@",
+                        [m valueForKey:@"type"], [m valueForKey:@"typeCategory"],
+                        [m valueForKey:@"desc"], [m valueForKey:@"id"]];
+            } @catch (NSException *e) { (void)e; }
+            NP_LOG(@"[dev#%lu] %@ %@", (unsigned long)i,
+                   NSStringFromClass([m class]), info);
+        }
     }
     NSMutableArray *kept = [NSMutableArray array];
     int dropped = 0;

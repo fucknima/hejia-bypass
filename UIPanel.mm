@@ -102,71 +102,83 @@ static void HTShowMenu(void) {
                                             handler:^(UIAlertAction *a) {
         (void)a;
 
-        NSFileManager *fm = [NSFileManager defaultManager];
-        unsigned long long freed = 0;
-        int files = 0;
+        // 放到后台队列：之前在按钮回调里同步删除上万个文件，
+        // 主线程被卡住超过 10 秒 → 被 watchdog 以 0x8BADF00D 杀掉。
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            @autoreleasepool {
+                NSFileManager *fm = [NSFileManager defaultManager];
+                unsigned long long freed = 0;
+                int files = 0;
 
-        // 1) Library/Caches
-        NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *caches = dirs.count ? dirs[0] : nil;
-        // 2) tmp
-        NSString *tmp = NSTemporaryDirectory();
+                NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+                NSString *caches = dirs.count ? dirs[0] : nil;
 
-        for (NSString *dir in @[caches ?: @"", tmp ?: @""]) {
-            if (dir.length == 0) continue;
-            NSArray *items = [fm contentsOfDirectoryAtPath:dir error:NULL];
-            for (NSString *it in items) {
-                NSString *full = [dir stringByAppendingPathComponent:it];
-                freed += HTDirSize(full);
-                if ([fm removeItemAtPath:full error:NULL]) files++;
+                // 只清 Caches（tmp 里有正在用的 socket/临时文件，删了会崩）
+                if (caches.length) {
+                    NSArray *items = [fm contentsOfDirectoryAtPath:caches error:NULL];
+                    for (NSString *it in items) {
+                        @try {
+                            NSString *full = [caches stringByAppendingPathComponent:it];
+                            freed += HTDirSize(full);
+                            if ([fm removeItemAtPath:full error:NULL]) files++;
+                        } @catch (NSException *e) { (void)e; }
+                    }
+                }
+
+                @try { [[NSURLCache sharedURLCache] removeAllCachedResponses]; } @catch (NSException *e) { (void)e; }
+
+                // 图片缓存：必须先 respondsToSelector 再调用，否则 unrecognized selector 崩溃
+                for (NSString *cn in @[@"SDImageCache", @"YYImageCache"]) {
+                    @try {
+                        Class c = objc_getClass([cn UTF8String]);
+                        if (!c) continue;
+                        id cache = nil;
+                        if ([(id)c respondsToSelector:sel_registerName("sharedImageCache")])
+                            cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedImageCache"));
+                        else if ([(id)c respondsToSelector:sel_registerName("sharedCache")])
+                            cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedCache"));
+                        if (!cache) continue;
+                        if ([cache respondsToSelector:sel_registerName("clearMemory")])
+                            ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearMemory"));
+                        if ([cache respondsToSelector:sel_registerName("clearDisk")])
+                            ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearDisk"));
+                    } @catch (NSException *e) {
+                        UI_LOG(@"图片缓存清理跳过（%@）", e.reason);
+                    }
+                }
+
+                NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                for (NSString *k in @[@"TabbarsDictCache", @"TabBarPageDictCacheKey",
+                                      @"shouldModifyTabbarInfoDict", @"ModifyTabbarInfoDict",
+                                      @"ModifyTabbarsDictForProvice"]) {
+                    [ud removeObjectForKey:k];
+                }
+                [ud synchronize];
+
+                UI_LOG(@"清理完成：%d 项，约 %llu KB", files, freed / 1024);
+
+                NSString *msg = [NSString stringWithFormat:
+                    @"已删除 %d 个缓存项，释放约 %llu MB。\n重启 App 后生效。",
+                    files, freed / (1024 * 1024)];
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertController *ok = [UIAlertController
+                        alertControllerWithTitle:@"清理完成"
+                                         message:msg
+                                  preferredStyle:UIAlertControllerStyleAlert];
+                    [ok addAction:[UIAlertAction actionWithTitle:@"稍后"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil]];
+                    [ok addAction:[UIAlertAction actionWithTitle:@"立即重启"
+                                                           style:UIAlertActionStyleDestructive
+                                                         handler:^(UIAlertAction *x) {
+                        (void)x;
+                        _exit(0);
+                    }]];
+                    [HTTopMost() presentViewController:ok animated:YES completion:nil];
+                });
             }
-        }
-
-        // 3) NSURLCache
-        [[NSURLCache sharedURLCache] removeAllCachedResponses];
-
-        // 4) 图片缓存（SDWebImage / YYWebImage，存在才清）
-        for (NSString *cn in @[@"SDImageCache", @"YYImageCache"]) {
-            Class c = objc_getClass([cn UTF8String]);
-            if (!c) continue;
-            id cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedImageCache"));
-            if (!cache) cache = ((id (*)(id, SEL))objc_msgSend)((id)c, sel_registerName("sharedCache"));
-            if (!cache) continue;
-            if ([cache respondsToSelector:sel_registerName("clearMemory")])
-                ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearMemory"));
-            if ([cache respondsToSelector:sel_registerName("clearDisk")])
-                ((void (*)(id, SEL))objc_msgSend)(cache, sel_registerName("clearDisk"));
-        }
-
-        // 5) 自家运营位缓存键
-        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-        for (NSString *k in @[@"TabbarsDictCache", @"TabBarPageDictCacheKey",
-                              @"shouldModifyTabbarInfoDict", @"ModifyTabbarInfoDict",
-                              @"ModifyTabbarsDictForProvice"]) {
-            [ud removeObjectForKey:k];
-        }
-        [ud synchronize];
-
-        UI_LOG(@"清理完成：%d 项，约 %llu KB", files, freed / 1024);
-
-        NSString *msg = [NSString stringWithFormat:
-            @"已删除 %d 个缓存项，释放约 %llu MB。\n重启 App 后生效。",
-            files, freed / (1024 * 1024)];
-
-        UIAlertController *ok = [UIAlertController
-            alertControllerWithTitle:@"清理完成"
-                             message:msg
-                      preferredStyle:UIAlertControllerStyleAlert];
-        [ok addAction:[UIAlertAction actionWithTitle:@"稍后"
-                                               style:UIAlertActionStyleCancel
-                                             handler:nil]];
-        [ok addAction:[UIAlertAction actionWithTitle:@"立即重启"
-                                               style:UIAlertActionStyleDestructive
-                                             handler:^(UIAlertAction *x) {
-            (void)x;
-            _exit(0);
-        }]];
-        [HTTopMost() presentViewController:ok animated:YES completion:nil];
+        });
     }]];
 
     [sheet addAction:[UIAlertAction actionWithTitle:@"取消"

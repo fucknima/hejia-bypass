@@ -102,6 +102,12 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
 
     self.title = @"工具箱";
     self.edgesForExtendedLayout = 0;      // UIRectEdgeNone：内容从导航栏下方开始
+    // 导航栏加实心背景，避免顶部透出 App 背景
+    UINavigationController *nav = self.navigationController;
+    if (nav) {
+        nav.navigationBar.translucent = NO;
+        nav.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
+    }
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
 
     self.navigationItem.rightBarButtonItem =
