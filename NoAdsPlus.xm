@@ -267,6 +267,37 @@ static void np_patch_cnc_ad(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 3.9 首页/通用页组件日志（只读，不拦截）
+//     用来拿到"工具""场景"等板块的组件类名，避免瞎猜
+// ---------------------------------------------------------------------------
+static BOOL np_compLogged = NO;
+static IMP np_orig_compGet = NULL;
+
+static id np_compGetView(id self, SEL _cmd, NSArray *dicts, id tabId, id block) {
+    typedef id (*fn_t)(id, SEL, NSArray *, id, id);
+    if (!np_compLogged && dicts.count) {
+        np_compLogged = YES;
+        NSUInteger n = dicts.count > 6 ? 6 : dicts.count;
+        for (NSUInteger i = 0; i < n; i++) {
+            @try {
+                NP_LOG(@"[comp#%lu] %@", (unsigned long)i, [dicts[i] description]);
+            } @catch (NSException *e) { (void)e; }
+        }
+    }
+    return np_orig_compGet ? ((fn_t)np_orig_compGet)(self, _cmd, dicts, tabId, block) : nil;
+}
+
+static void np_patch_comp_log(void) {
+    Class c = objc_getClass("HYComponentManager");
+    if (!c) return;
+    Method m = class_getInstanceMethod(c, sel_registerName("getViewWithComponentDictArray:tabId:completeBlock:"));
+    if (!m) return;
+    np_orig_compGet = method_getImplementation(m);
+    method_setImplementation(m, (IMP)np_compGetView);
+    NP_LOG(@"[OK] HYComponentManager 组件日志已开启");
+}
+
+// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -360,6 +391,7 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_device_ads();
         np_patch_myinfo();
         np_patch_cnc_ad();
+        np_patch_comp_log();
         if (np_banner_on()) {
             np_patch_banners();
         } else {
