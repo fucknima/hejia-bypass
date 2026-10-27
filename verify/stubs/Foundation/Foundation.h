@@ -62,6 +62,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (NSString *)stringByExpandingTildeInPath;
 - (NSString *)stringByAppendingPathComponent:(NSString *)c;
 - (id)dataUsingEncoding:(NSStringEncoding)e;
+- (BOOL)writeToFile:(NSString *)p atomically:(BOOL)a encoding:(NSStringEncoding)e error:(id *)err;
 - (NSString *)description;
 - (NSString *)stringByAppendingPathComponent:(NSString *)c;
 @end
@@ -71,6 +72,10 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (void)appendString:(NSString *)s;
 @end
 @interface NSException : NSObject @end
+@interface NSNumber : NSObject
++ (NSNumber *)numberWithBool:(BOOL)b;
+- (BOOL)boolValue;
+@end
 @interface NSArray<T> : NSObject <NSFastEnumeration>
 + (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
 @property (readonly) NSUInteger count;
@@ -81,6 +86,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 + (instancetype)array;
 + (instancetype)arrayWithCapacity:(NSUInteger)n;
 - (void)addObject:(T)o;
+- (void)addObjectsFromArray:(NSArray *)a;
+- (void)insertObject:(T)o atIndex:(NSUInteger)i;
 - (void)removeObjectAtIndex:(NSUInteger)i;
 - (void)removeLastObject;
 - (T)lastObject;
@@ -127,6 +134,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (BOOL)fileExistsAtPath:(NSString *)p isDirectory:(BOOL *)d;
 - (BOOL)fileExistsAtPath:(NSString *)p;
 - (BOOL)createDirectoryAtPath:(NSString *)p withIntermediateDirectories:(BOOL)i attributes:(id)a error:(id *)e;
+- (id)containerURLForSecurityApplicationGroupIdentifier:(NSString *)g;
+- (BOOL)removeItemAtPath:(NSString *)p error:(id *)e;
 @end
 
 @interface NSBundle : NSObject
@@ -172,6 +181,7 @@ void NSLog(NSString *format, ...);
 typedef unsigned long NSSearchPathDirectory;
 typedef unsigned long NSSearchPathDomainMask;
 static const NSSearchPathDirectory NSCachesDirectory = 13;
+static const NSSearchPathDirectory NSDocumentDirectory = 9;
 static const NSSearchPathDomainMask NSUserDomainMask = 1;
 NSString *NSTemporaryDirectory(void);
 NSArray<NSString *> *NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory d, NSSearchPathDomainMask m, BOOL e);

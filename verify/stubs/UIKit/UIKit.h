@@ -44,7 +44,7 @@ void CGContextSetLineWidth(CGContextRef c, CGFloat w);
 - (void)drawInRect:(CGRect)r;
 - (UIImage *)imageWithRenderingMode:(NSInteger)m;
 @end
-enum { UIImageRenderingModeAlwaysOriginal = 2 };
+enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplate = 2 };
 
 @interface UIView : NSObject
 @property (nonatomic) CGRect frame;
@@ -107,12 +107,14 @@ enum { UITableViewStyleInsetGrouped = 2 };
 
 @interface UIBarButtonItem : NSObject
 - (instancetype)initWithBarButtonSystemItem:(NSInteger)i target:(id)t action:(SEL)a;
+- (instancetype)initWithImage:(UIImage *)img style:(NSInteger)s target:(id)t action:(SEL)a;
 @end
-enum { UIBarButtonSystemItemDone = 0 };
+enum { UIBarButtonSystemItemDone = 0, UIBarButtonItemStylePlain = 0 };
 
 @interface UINavigationItem : NSObject
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, strong) UIBarButtonItem *rightBarButtonItem;
+@property (nonatomic, copy) NSArray<UIBarButtonItem *> *rightBarButtonItems;
 @end
 
 @interface UIViewController : NSObject
@@ -121,6 +123,7 @@ enum { UIBarButtonSystemItemDone = 0 };
 @property (nonatomic, readonly) UIView *view;
 @property (nonatomic, strong) UIViewController *presentedViewController;
 @property (nonatomic) NSInteger modalPresentationStyle;
+@property (nonatomic, readonly) id navigationController;
 - (void)viewDidLoad;
 - (void)presentViewController:(UIViewController *)vc animated:(BOOL)a completion:(void (^)(void))c;
 - (void)dismissViewControllerAnimated:(BOOL)a completion:(void (^)(void))c;
