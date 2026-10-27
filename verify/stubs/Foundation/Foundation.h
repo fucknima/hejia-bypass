@@ -82,6 +82,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 @property (nonatomic, readonly) NSString *reason; @end
 @interface NSNumber : NSObject
 + (NSNumber *)numberWithBool:(BOOL)b;
+- (NSInteger)integerValue;
+- (int)intValue;
 - (BOOL)boolValue;
 - (long)longValue;
 @end

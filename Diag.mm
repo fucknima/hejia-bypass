@@ -25,11 +25,19 @@ static id HTDiagHitTest(id self, SEL _cmd, CGPoint point, id event) {
 
     if (gHitCount < 20) {
         gHitCount++;
-        D_LOG(@"hit#%d on %@ (%.0f,%.0f) -> %@",
+        NSString *extra = @"";
+        if (hit) {
+            CGRect f = ((UIView *)hit).frame;
+            extra = [NSString stringWithFormat:@" frame=(%.0f,%.0f,%.0f,%.0f) super=%@",
+                     f.origin.x, f.origin.y, f.size.width, f.size.height,
+                     NSStringFromClass([((UIView *)hit).superview class])];
+        }
+        D_LOG(@"hit#%d on %@ (%.0f,%.0f) -> %@%@",
               gHitCount,
               NSStringFromClass([self class]),
               point.x, point.y,
-              hit ? NSStringFromClass([hit class]) : @"nil");
+              hit ? NSStringFromClass([hit class]) : @"nil",
+              extra);
     }
     return hit;
 }
