@@ -451,7 +451,7 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_myinfo();
         np_patch_cnc_ad();
         np_patch_scene_close();
-        np_patch_comp_filter();
+        // np_patch_comp_filter();  // 组件过滤（启发式）暂停：它 hook 的是首页组件构建入口，风险最高
         if (np_banner_on()) {
             np_patch_banners();
         } else {
