@@ -43,9 +43,34 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
     NSString *title   = vc.title;
     NSString *tabId   = nil;
 
-    // 诊断：把每个 tab 的真实信息打出来（只在开关打开时）
+    // ⚠️ 关键：Tab 里装的是 HYCustomNavigationController（UINavigationController 子类），
+    //    真正的页面在 topViewController / viewControllers[0] 里。
+    //    必须先拆开导航控制器再判断。
+    UIViewController *real = vc;
+    NSString *innerCls = nil;
+    NSString *innerTitle = nil;
+    if ([vc isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *nav = (UINavigationController *)vc;
+        UIViewController *top = nav.topViewController;
+        if (!top && nav.viewControllers.count > 0) {
+            top = nav.viewControllers[0];
+        }
+        if (top) {
+            real = top;
+            innerCls = NSStringFromClass([top class]);
+            innerTitle = top.title;
+        }
+    }
+    NSString *innerTabId = nil;
+    @try {
+        id v2 = [real valueForKey:@"tabbarId"];
+        if ([v2 isKindOfClass:[NSString class]]) innerTabId = (NSString *)v2;
+    } @catch (NSException *e) { (void)e; }
+
+    // 诊断：把真实信息打出来
     if (hideService || hideFind) {
-        TAB_LOG(@"检查 tab: class=%@ title=%@", clsName, title);
+        TAB_LOG(@"检查 tab: outer=%@ inner=%@ title=%@ innerTitle=%@ tabId=%@",
+                clsName, innerCls ?: @"-", title, innerTitle ?: @"-", innerTabId ?: @"-");
     }
 
     // VC 上若有 tabbarId 属性，优先读取（KVC，避免 objc_msgSend 类型问题）
@@ -57,26 +82,30 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
     const char *cn = clsName.UTF8String;
     const char *tt = title.UTF8String;
 
-    // 大小写不敏感匹配
-    NSString *cnLower = [clsName lowercaseString];
-    NSString *tiLower = tabId ? [tabId lowercaseString] : nil;
-    const char *cnl = cnLower.UTF8String;
-    const char *til = tiLower.UTF8String;
+    // 大小写不敏感匹配（外层 + 内层 + tabId 全都参与）
+    NSMutableString *pool = [NSMutableString string];
+    if (clsName)    [pool appendString:[clsName lowercaseString]];
+    if (innerCls)   [pool appendString:@" "], [pool appendString:[innerCls lowercaseString]];
+    if (title)      [pool appendString:@" "], [pool appendString:[title lowercaseString]];
+    if (innerTitle) [pool appendString:@" "], [pool appendString:[innerTitle lowercaseString]];
+    if (tabId)      [pool appendString:@" "], [pool appendString:[tabId lowercaseString]];
+    if (innerTabId) [pool appendString:@" "], [pool appendString:[innerTabId lowercaseString]];
+
+    const char *cnl = pool.UTF8String;
 
     if (hideFind) {
-        if ((til && strstr(til, "find")) ||
-            (cnl && strstr(cnl, "find")) ||
-            (cnl && strstr(cnl, "discover")) ||
-            (tt && (strcmp(tt, "发现") == 0))) {
+        if ((cnl && (strstr(cnl, "find") || strstr(cnl, "discover"))) ||
+            (tt && strcmp(tt, "发现") == 0) ||
+            (innerTitle && strcmp(innerTitle.UTF8String ?: "", "发现") == 0)) {
             TAB_LOG(@"隐藏 tab: %s (%s)", cn ?: "?", tt ?: "?");
             return YES;
         }
     }
 
     if (hideService) {
-        if ((til && (strstr(til, "life") || strstr(til, "service"))) ||
-            (cnl && (strstr(cnl, "life") || strstr(cnl, "service"))) ||
-            (tt && (strcmp(tt, "服务") == 0))) {
+        if ((cnl && (strstr(cnl, "life") || strstr(cnl, "service"))) ||
+            (tt && strcmp(tt, "服务") == 0) ||
+            (innerTitle && strcmp(innerTitle.UTF8String ?: "", "服务") == 0)) {
             TAB_LOG(@"隐藏 tab: %s (%s)", cn ?: "?", tt ?: "?");
             return YES;
         }

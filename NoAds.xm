@@ -50,22 +50,29 @@ static BOOL na_isEnabled(void) {
 // 广告接口特征表
 // ===========================================================================
 static const char *kAdURLMarkers[] = {
-    "/ads/page/start",
-    "/ads/adv/common",
-    "/ads/",
-    "getBannerContentList",
-    "getTabBannerList",
-    "/idx/",                 // 首页所有运营位（banner/推荐/活动）
-    "getMsiRecommendContentList",
-    "getLoginOperationList",
-    "getAiClawEntrance",
-    "getDeviceRecommendRuleList",
-    "/lecam/",               // 活动列表
-    "/ads/",
-    "/ad/report",
+    // 只拦真正的广告/推广接口，绝不动核心业务接口
+    "/ads/page/start",          // 开屏广告
+    "/ads/adv/common",          // 通用广告位
+    "/ad/report",               // 广告埋点
     "/ad/click",
     "/ad/impression",
     "/ad/statistics",
+    "getBannerContentList",     // 首页 banner 推广
+    "getTabBannerList",         // Tab 页 banner 推广
+    NULL
+};
+
+// 明确排除：这些是核心业务接口，即使命中上面的关键字也不能拦
+static const char *kNeverBlock[] = {
+    "deviceListApp",            // 设备列表
+    "getFrameList",             // 首页框架/布局
+    "getPlaceList",             // 栏目配置
+    "getDynamicPlaceList",
+    "getTabContentList",        // Tab 内容
+    "getTriggerMsgList",        // 消息
+    "getYdnGuideBindList",      // 引导绑定
+    "/photo/",                  // 图片资源
+    ".png", ".jpg", ".webp",    // 静态资源
     NULL
 };
 
@@ -73,6 +80,12 @@ static BOOL na_isAdURL(NSString *url) {
     if (![url isKindOfClass:[NSString class]]) return NO;
     const char *s = url.UTF8String;
     if (!s) return NO;
+
+    // 先排除核心业务
+    for (int i = 0; kNeverBlock[i]; i++) {
+        if (strstr(s, kNeverBlock[i])) return NO;
+    }
+    // 再匹配广告特征
     for (int i = 0; kAdURLMarkers[i]; i++) {
         if (strstr(s, kAdURLMarkers[i])) return YES;
     }
@@ -443,6 +456,24 @@ static void HeJiaNoAdsInit(void) {
                 na_patchAdDataGetters();
                 na_patchShowFlags();
                 NA_LOG(@"════ 广告屏蔽完成 ════");
+            }
+        });
+
+        // 诊断：记录「我的」页组件类型，便于定位推广位
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6.0 * NSEC_PER_SEC)),
+                       dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+            @autoreleasepool {
+                Class mgr = objc_getClass("HYMyInfoComponentManager");
+                if (mgr) {
+                    NA_SCAN("\n===== 我的页组件诊断 =====\n");
+                    unsigned int n = 0;
+                    Method *ms = class_copyMethodList(mgr, &n);
+                    for (unsigned int i = 0; i < n; i++) {
+                        const char *sn = sel_getName(method_getName(ms[i]));
+                        if (sn) NA_SCAN("[MGR-SEL] %s\n", sn);
+                    }
+                    free(ms);
+                }
             }
         });
 
