@@ -62,11 +62,13 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic, readonly) NSArray<UIView *> *subviews;
 @property (nonatomic) CGRect frame;
 @property (nonatomic) CGRect bounds;
+@property (nonatomic) CGPoint center;
 @property (nonatomic, readonly) UIView *superview;
 @property (nonatomic) BOOL hidden;
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
+- (void)setNeedsLayout;
 - (void)sendEvent:(UIEvent *)e;
 - (void)motionEnded:(NSInteger)subtype withEvent:(UIEvent *)e;
 - (void)addGestureRecognizer:(id)g;

@@ -73,7 +73,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 + (instancetype)string;
 - (void)appendString:(NSString *)s;
 @end
-@interface NSException : NSObject @end
+@interface NSException : NSObject
+@property (nonatomic, readonly) NSString *reason; @end
 @interface NSNumber : NSObject
 + (NSNumber *)numberWithBool:(BOOL)b;
 - (BOOL)boolValue;
@@ -94,6 +95,8 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (void)removeObjectAtIndex:(NSUInteger)i;
 - (void)removeLastObject;
 - (T)lastObject;
+- (void)setObject:(T)o atIndexedSubscript:(NSUInteger)i;
+- (T)objectAtIndexedSubscript:(NSUInteger)i;
 - (T)firstObject;
 - (NSUInteger)indexOfObject:(T)o;
 @end

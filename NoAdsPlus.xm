@@ -100,6 +100,16 @@ static void np_patch_mcs_popups(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 3.5 设备页「场景 + 产品功能图册」卡片
+//     日志实测：首页出现 HYHardwareSceneAndBannerView / HYCommonHardwareSenceHalfViewBannerCell，
+//     即使 getBannerContentList 已被拦，这张卡仍由本地默认数据渲染 → 直接掐数据入口
+// ---------------------------------------------------------------------------
+static void np_patch_hardware_banner(void) {
+    np_hook("HYHardwareSceneAndBannerView", "reloadBanner:",    (IMP)np_v1);
+    np_hook("HYHardwareSceneAndBannerView", "reloadAllBanner:", (IMP)np_v1);
+}
+
+// ---------------------------------------------------------------------------
 // 4. Banner 运营位（33 处引用的数据源）
 //    直接短路 4 个入口 → 不发请求、不出运营位；调用方本来就有“无数据”分支。
 // ---------------------------------------------------------------------------
@@ -190,6 +200,7 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_launch_ad();
         np_patch_own_ads();
         np_patch_mcs_popups();
+        np_patch_hardware_banner();
         if (np_banner_on()) {
             np_patch_banners();
         } else {
