@@ -61,6 +61,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (NSString *)stringByAppendingString:(NSString *)s;
 - (NSString *)stringByReplacingOccurrencesOfString:(NSString *)a withString:(NSString *)b;
 - (NSString *)stringByExpandingTildeInPath;
+- (NSString *)lowercaseString;
 - (NSString *)stringByAppendingPathComponent:(NSString *)c;
 - (id)dataUsingEncoding:(NSStringEncoding)e;
 - (BOOL)writeToFile:(NSString *)p atomically:(BOOL)a encoding:(NSStringEncoding)e error:(id *)err;

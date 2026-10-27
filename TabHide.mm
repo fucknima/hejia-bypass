@@ -43,6 +43,11 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
     NSString *title   = vc.title;
     NSString *tabId   = nil;
 
+    // 诊断：把每个 tab 的真实信息打出来（只在开关打开时）
+    if (hideService || hideFind) {
+        TAB_LOG(@"检查 tab: class=%@ title=%@", clsName, title);
+    }
+
     // VC 上若有 tabbarId 属性，优先读取（KVC，避免 objc_msgSend 类型问题）
     @try {
         id v = [vc valueForKey:@"tabbarId"];
@@ -51,20 +56,27 @@ static BOOL HTShouldHideTab(UIViewController *vc) {
 
     const char *cn = clsName.UTF8String;
     const char *tt = title.UTF8String;
-    const char *ti = tabId.UTF8String;
+
+    // 大小写不敏感匹配
+    NSString *cnLower = [clsName lowercaseString];
+    NSString *tiLower = tabId ? [tabId lowercaseString] : nil;
+    const char *cnl = cnLower.UTF8String;
+    const char *til = tiLower.UTF8String;
 
     if (hideFind) {
-        if ((ti && strstr(ti, "find")) ||
-            (cn && strstr(cn, "Find")) ||
-            (tt && strcmp(tt, "发现") == 0)) {
+        if ((til && strstr(til, "find")) ||
+            (cnl && strstr(cnl, "find")) ||
+            (cnl && strstr(cnl, "discover")) ||
+            (tt && (strcmp(tt, "发现") == 0))) {
             TAB_LOG(@"隐藏 tab: %s (%s)", cn ?: "?", tt ?: "?");
             return YES;
         }
     }
 
     if (hideService) {
-        if ((ti && (strstr(ti, "life") || strstr(ti, "service"))) ||
-            (tt && strcmp(tt, "服务") == 0)) {
+        if ((til && (strstr(til, "life") || strstr(til, "service"))) ||
+            (cnl && (strstr(cnl, "life") || strstr(cnl, "service"))) ||
+            (tt && (strcmp(tt, "服务") == 0))) {
             TAB_LOG(@"隐藏 tab: %s (%s)", cn ?: "?", tt ?: "?");
             return YES;
         }
