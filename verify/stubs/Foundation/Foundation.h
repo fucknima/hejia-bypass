@@ -32,9 +32,15 @@ void *dispatch_get_global_queue(long identifier, unsigned long flags);
 void dispatch_once(dispatch_once_t *predicate, dispatch_block_t block);
 void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 
+@class NSString;
 @interface NSObject
 + (Class)class;
 - (Class)class;
++ (id)alloc;
++ (id)new;
+- (id)init;
++ (instancetype)stringWithFormat:(NSString *)f, ...;
+- (NSString *)description;
 - (BOOL)isKindOfClass:(Class)c;
 - (BOOL)respondsToSelector:(SEL)s;
 - (id)performSelector:(SEL)s;
@@ -54,9 +60,17 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 - (NSString *)stringByAppendingString:(NSString *)s;
 - (NSString *)stringByReplacingOccurrencesOfString:(NSString *)a withString:(NSString *)b;
 - (NSString *)stringByExpandingTildeInPath;
+- (NSString *)stringByAppendingPathComponent:(NSString *)c;
 - (id)dataUsingEncoding:(NSStringEncoding)e;
+- (NSString *)description;
+- (NSString *)stringByAppendingPathComponent:(NSString *)c;
 @end
 
+@interface NSMutableString : NSString
++ (instancetype)string;
+- (void)appendString:(NSString *)s;
+@end
+@interface NSException : NSObject @end
 @interface NSArray<T> : NSObject <NSFastEnumeration>
 + (instancetype)arrayWithObjects:(const T [])objects count:(NSUInteger)cnt;
 @property (readonly) NSUInteger count;
@@ -76,6 +90,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 
 @interface NSDictionary<K, V> : NSObject
 + (instancetype)dictionaryWithObjects:(const V [])objects forKeys:(const K [])keys count:(NSUInteger)cnt;
+- (V)objectForKeyedSubscript:(K)k;
 @end
 
 @interface NSData : NSObject
@@ -111,6 +126,7 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 + (instancetype)defaultManager;
 - (BOOL)fileExistsAtPath:(NSString *)p isDirectory:(BOOL *)d;
 - (BOOL)fileExistsAtPath:(NSString *)p;
+- (BOOL)createDirectoryAtPath:(NSString *)p withIntermediateDirectories:(BOOL)i attributes:(id)a error:(id *)e;
 @end
 
 @interface NSBundle : NSObject
@@ -151,6 +167,22 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 NSString *NSStringFromClass(Class c);
 NSString *NSStringFromSelector(SEL s);
 void NSLog(NSString *format, ...);
+
+
+typedef unsigned long NSSearchPathDirectory;
+typedef unsigned long NSSearchPathDomainMask;
+static const NSSearchPathDirectory NSCachesDirectory = 13;
+static const NSSearchPathDomainMask NSUserDomainMask = 1;
+NSString *NSTemporaryDirectory(void);
+NSArray<NSString *> *NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory d, NSSearchPathDomainMask m, BOOL e);
+@interface NSDate : NSObject
++ (instancetype)date;
+- (NSString *)description;
+@end
+@interface NSDateFormatter : NSObject
+@property (nonatomic, copy) NSString *dateFormat;
+- (NSString *)stringFromDate:(NSDate *)d;
+@end
 
 #ifdef __cplusplus
 }

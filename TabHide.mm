@@ -22,7 +22,8 @@
 
 #include <substrate.h>
 
-#define TAB_LOG(fmt, ...) NSLog(@"[HeJiaTab] " fmt, ##__VA_ARGS__)
+extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+#define TAB_LOG(fmt, ...) HTWriteLog("HeJiaTab", fmt, ##__VA_ARGS__)
 
 extern "C" {
 

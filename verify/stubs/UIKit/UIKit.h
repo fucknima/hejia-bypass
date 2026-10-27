@@ -160,6 +160,10 @@ enum { UIAlertControllerStyleAlert = 1 };
 @property (nonatomic, strong) UIViewController *rootViewController;
 @end
 
+@interface UIPasteboard : NSObject
++ (instancetype)generalPasteboard;
+@property (nonatomic, copy) NSString *string;
+@end
 @interface UIApplication : NSObject
 + (instancetype)sharedApplication;
 @property (nonatomic, readonly) NSArray<UIWindow *> *windows;

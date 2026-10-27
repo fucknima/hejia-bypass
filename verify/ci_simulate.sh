@@ -2,7 +2,7 @@
 # 严格模拟 GitHub Actions 上的 Theos 编译环境
 set -e
 D=$(cd "$(dirname "$0")" && pwd)
-FILES="Tweak.xm NoAds.xm UIPanel.mm SettingsVC.mm TabHide.mm"
+FILES="Tweak.xm NoAds.xm UIPanel.mm SettingsVC.mm TabHide.mm LogFile.mm"
 for ARCH in arm64 arm64e; do
   for F in $FILES; do
     echo "### $F ($ARCH)"

@@ -22,7 +22,8 @@
 
 #include <substrate.h>
 
-#define UI_LOG(fmt, ...) NSLog(@"[HeJiaUI] " fmt, ##__VA_ARGS__)
+extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+#define UI_LOG(fmt, ...) HTWriteLog("HeJiaUI", fmt, ##__VA_ARGS__)
 
 extern "C" {
 

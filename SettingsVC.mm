@@ -11,7 +11,10 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#define SVC_LOG(fmt, ...) NSLog(@"[HeJiaUI] " fmt, ##__VA_ARGS__)
+extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+extern "C" const char *HTGetLogFilePath(void);
+extern "C" const char *HTGetAdScanLogPath(void);
+#define SVC_LOG(fmt, ...) HTWriteLog("HeJiaUI", fmt, ##__VA_ARGS__)
 
 extern "C" {
 
@@ -53,22 +56,27 @@ extern UIViewController *HTMakeSettingsVC(void);
 
 #pragma mark - 数据源
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tv { (void)tv; return 2; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tv { (void)tv; return 3; }
 
 - (NSString *)tableView:(UITableView *)tv titleForHeaderInSection:(NSInteger)s {
     (void)tv;
-    return s == 0 ? @"增强功能" : @"安全";
+    if (s == 0) return @"增强功能";
+    if (s == 1) return @"安全";
+    return @"日志与诊断";
 }
 
 - (NSString *)tableView:(UITableView *)tv titleForFooterInSection:(NSInteger)s {
     (void)tv;
     if (s == 1) return @"过签名检测默认开启且不可关闭，否则应用将被判定为已篡改。";
+    if (s == 2) return @"日志位于 App 沙盒 Library/Caches/HeJiaTool/，可长按复制路径。扫描明细含每个被屏蔽的广告类与拦截的广告请求。";
     return nil;
 }
 
 - (NSInteger)tableView:(UITableView *)tv numberOfRowsInSection:(NSInteger)s {
     (void)tv;
-    return s == 0 ? 3 : 1;
+    if (s == 0) return 3;
+    if (s == 1) return 1;
+    return 2;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tv cellForRowAtIndexPath:(NSIndexPath *)ip {
@@ -97,7 +105,7 @@ extern UIViewController *HTMakeSettingsVC(void);
         sw.enabled = YES;
         sw.tag = (NSInteger)(100 + ip.row);
         [sw setOn:[ud boolForKey:keys[ip.row]] animated:NO];
-    } else {
+    } else if (ip.section == 1) {
         cell.textLabel.text = @"过签名检测";
         cell.textLabel.textColor = [UIColor labelColor];
         sw.hidden = NO;
@@ -105,6 +113,17 @@ extern UIViewController *HTMakeSettingsVC(void);
         sw.tag = 200;
         [sw setOn:YES animated:NO];
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    } else {
+        // 日志路径展示
+        sw.hidden = YES;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        if (ip.row == 0) {
+            cell.textLabel.text = @"主日志  HeJiaTool.log";
+            cell.textLabel.textColor = [UIColor systemBlueColor];
+        } else {
+            cell.textLabel.text = @"扫描明细  adscan.log";
+            cell.textLabel.textColor = [UIColor systemBlueColor];
+        }
     }
     return cell;
 }
@@ -112,6 +131,21 @@ extern UIViewController *HTMakeSettingsVC(void);
 - (void)tableView:(UITableView *)tv didSelectRowAtIndexPath:(NSIndexPath *)ip {
     (void)tv;
     [tv deselectRowAtIndexPath:ip animated:YES];
+    if (ip.section == 2) {
+        const char *p = (ip.row == 0) ? HTGetLogFilePath() : HTGetAdScanLogPath();
+        NSString *path = [NSString stringWithUTF8String:p ?: ""];
+        [UIPasteboard generalPasteboard].string = path;
+
+        UIAlertController *a = [UIAlertController
+            alertControllerWithTitle:@"日志路径（已复制）"
+                             message:path
+                      preferredStyle:UIAlertControllerStyleAlert];
+        [a addAction:[UIAlertAction actionWithTitle:@"好"
+                                              style:UIAlertActionStyleDefault
+                                            handler:nil]];
+        [self presentViewController:a animated:YES completion:nil];
+        return;
+    }
     if (ip.section == 1) {
         UIAlertController *a = [UIAlertController
             alertControllerWithTitle:@"过签名检测"

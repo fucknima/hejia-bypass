@@ -46,7 +46,8 @@ extern int ptrace(int request, pid_t pid, caddr_t addr, int data);
 // ---------------------------------------------------------------------------
 // 日志
 // ---------------------------------------------------------------------------
-#define HM_LOG(fmt, ...) NSLog(@"[HeJiaBypass] " fmt, ##__VA_ARGS__)
+extern "C" void HTWriteLog(const char *tag, NSString *fmt, ...);
+#define HM_LOG(fmt, ...) HTWriteLog("HeJiaBypass", fmt, ##__VA_ARGS__)
 
 // ---------------------------------------------------------------------------
 // 工具：仅当方法真实存在才替换，避免向不存在的类注入导致崩溃
