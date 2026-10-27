@@ -389,9 +389,11 @@ static void HeJiaNoAdsPlusInit(void) {
         np_patch_own_ads();
         np_patch_mcs_popups();
         np_patch_device_ads();
-        np_patch_myinfo();
-        np_patch_cnc_ad();
-        np_patch_comp_log();
+        // ⚠️ 以下三项在 15:55 那次实测出现整屏黑屏，已停用（代码保留，确认原因后再开）
+        // np_patch_myinfo();     // 我的页组件过滤
+        // np_patch_cnc_ad();     // 摄像头广告条隐藏
+        // np_patch_comp_log();   // 首页组件日志
+        NP_LOG(@"[SKIP] myinfo/cnc/comp 三项已停用（黑屏排查）");
         if (np_banner_on()) {
             np_patch_banners();
         } else {

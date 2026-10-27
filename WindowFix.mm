@@ -50,7 +50,8 @@ static void HTScanWindows(void) {
             if (!root) continue;
 
             NSUInteger n = root.subviews.count;
-            int streak = (int)w.tag;          // 用 tag 记连续空扫描次数
+            static int streak = 0;            // 只有这一个高位窗口，用静态计数即可
+            (void)0;
 
             WIN_LOG(@"scan level=%.0f vc=%@ h=%d sub=%lu streak=%d",
                     (double)lv,
@@ -59,7 +60,6 @@ static void HTScanWindows(void) {
 
             if (n == 0) {
                 streak++;
-                w.tag = streak;
                 // 连续两次都是空壳 → 直接隐藏（隐藏的窗口不参与命中测试，触摸必然落到主窗口）
                 if (streak >= 2 && !w.hidden) {
                     w.hidden = YES;
@@ -67,7 +67,7 @@ static void HTScanWindows(void) {
                             vc ? NSStringFromClass([vc class]) : @"(nil)");
                 }
             } else {
-                w.tag = 0;
+                streak = 0;
             }
         } @catch (NSException *e) { (void)e; }
     }
