@@ -163,6 +163,44 @@ static void HTHideAI(UIView *tabBar) {
 }
 
 // ---------------------------------------------------------------------------
+// 均匀重排：只改 transform（平移），不触发父视图 layout
+// ---------------------------------------------------------------------------
+static void HTRepositionItems(UIView *tabBar) {
+    if (!tabBar) return;
+
+    NSMutableArray *visible = [NSMutableArray array];
+    for (UIView *v in tabBar.subviews) {
+        if (![v isKindOfClass:objc_getClass("HYCustomTabBarItem")]) continue;
+        if (v.hidden) continue;
+        [visible addObject:v];
+    }
+    if (visible.count == 0 || visible.count > 6) return;
+
+    // 按未变换的 center.x 排序
+    NSUInteger n = visible.count;
+    for (NSUInteger i = 1; i < n; i++) {
+        UIView *key = visible[i];
+        NSInteger j = (NSInteger)i - 1;
+        while (j >= 0 && ((UIView *)visible[(NSUInteger)j]).center.x > key.center.x) {
+            visible[(NSUInteger)(j + 1)] = visible[(NSUInteger)j];
+            j--;
+        }
+        visible[(NSUInteger)(j + 1)] = key;
+    }
+
+    CGFloat w = tabBar.bounds.size.width;
+    if (w <= 1) return;
+
+    for (NSUInteger k = 0; k < n; k++) {
+        UIView *it = visible[k];
+        CGFloat dx = w * ((CGFloat)k + 0.5f) / (CGFloat)n - it.center.x;
+        if (fabs(it.transform.tx - dx) > 0.5f) {
+            it.transform = CGAffineTransformMakeTranslation(dx, 0);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 static void HTScanAllBars(BOOL doAI) {
     UIWindow *win = nil;
     for (UIWindow *w in [UIApplication sharedApplication].windows) {
@@ -183,6 +221,7 @@ static void HTScanAllBars(BOOL doAI) {
         if ([v isKindOfClass:barCls]) {
             HTHideTabItems(v);
             if (doAI) HTHideAI(v);
+            HTRepositionItems(v);
             found++;
         }
         for (UIView *s in v.subviews) [stack addObject:s];
@@ -195,15 +234,11 @@ static void HeJiaTabInit(void) {
     @autoreleasepool {
         TAB_LOG(@"════ Tab 模块 v8 加载（纯定时器隐藏，不 hook 布局）════");
 
-        // 一次性迁移：配置版本变化时把三个 Tab 开关复位为关，
-        // 保证"装上新版先能正常用"，再让用户按需打开。
         NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
         id ver = [ud objectForKey:@"HeJiaTool_TabVer"];
-        if (![ver isKindOfClass:[NSString class]] || ![(NSString *)ver isEqualToString:@"7"]) {
-            // 只复位 AI：服务/发现 的隐藏在前几版已实测不卡，保持不变
-            [ud setBool:NO forKey:kHideAIKey];
-            [ud setObject:@"7" forKey:@"HeJiaTool_TabVer"];
-            TAB_LOG(@"配置版本升级：AI 开关已重置为关（需要时到工具箱再打开）");
+        if (![ver isKindOfClass:[NSString class]] || ![(NSString *)ver isEqualToString:@"9"]) {
+            [ud setObject:@"9" forKey:@"HeJiaTool_TabVer"];
+            TAB_LOG(@"配置版本 v9（开关保持用户设置，不再复位）");
         }
 
         // ⚠️ 不再 hook layoutSubviews：

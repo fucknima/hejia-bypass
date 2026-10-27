@@ -10,6 +10,7 @@ typedef struct { CGFloat width, height; } CGSize;
 typedef struct { CGPoint origin; CGSize size; } CGRect;
 typedef struct { NSUInteger location, length; } NSRange;
 NSRange NSMakeRange(NSUInteger l, NSUInteger n);
+extern const CGRect CGRectZero;
 typedef struct CGContext *CGContextRef;
 extern const CGPoint CGPointZero;
 
@@ -54,6 +55,11 @@ void CGContextSetLineWidth(CGContextRef c, CGFloat w);
 - (void)set;
 - (void)setFill;
 - (void)setStroke;
+
++ (UIColor *)secondaryLabelColor;
++ (UIColor *)secondarySystemGroupedBackgroundColor;
++ (UIColor *)systemGreenColor;
++ (UIColor *)systemRedColor;
 @end
 
 @interface UIImage : NSObject
@@ -83,6 +89,7 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic, readonly) BOOL isUserInteractionEnabled;
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
+- (instancetype)initWithFrame:(CGRect)f;
 - (void)layoutSubviews;
 - (UIView *)hitTest:(CGPoint)p withEvent:(id)e;
 - (void)setNeedsLayout;
@@ -118,6 +125,10 @@ enum { UIControlEventTouchUpInside = 64, UIControlEventValueChanged = 4096,
 
 @interface UIFont : NSObject
 + (UIFont *)monospacedSystemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
+
++ (UIFont *)systemFontOfSize:(CGFloat)sz;
++ (UIFont *)systemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
++ (UIFont *)boldSystemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
 @end
 @interface UITextView : UIView
 - (instancetype)initWithFrame:(CGRect)f;
@@ -131,6 +142,9 @@ enum { UIControlEventTouchUpInside = 64, UIControlEventValueChanged = 4096,
 @interface UILabel : UIView
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, strong) UIColor *textColor;
+
+@property (nonatomic, strong) UIFont *font;
+@property (nonatomic) NSInteger numberOfLines;
 @end
 
 @interface UITableViewCell : UIView
@@ -138,6 +152,10 @@ enum { UIControlEventTouchUpInside = 64, UIControlEventValueChanged = 4096,
 @property (nonatomic, readonly) UILabel *textLabel;
 @property (nonatomic, strong) UIView *accessoryView;
 @property (nonatomic) NSInteger selectionStyle;
+
+@property (nonatomic, readonly) UIView *contentView;
+
+@property (nonatomic, strong) UIView *tableHeaderView;
 @end
 enum { UITableViewCellStyleDefault = 0,
        UITableViewCellSelectionStyleNone = 0,
@@ -152,6 +170,7 @@ enum { UITableViewCellStyleDefault = 0,
 - (id)dequeueReusableCellWithIdentifier:(NSString *)cid;
 - (void)deselectRowAtIndexPath:(id)ip animated:(BOOL)a;
 @property (nonatomic, strong) UIColor *backgroundColor;
+@property (nonatomic, strong) UIView *tableHeaderView;
 @end
 enum { UITableViewStyleInsetGrouped = 2 };
 
