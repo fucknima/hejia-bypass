@@ -133,7 +133,7 @@ extern "C" UIViewController *HTMakeLogViewer(NSString *path, NSString *title);
 
     UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(20, 18, 240, 28)];
     name.text = @"HeJiaTool";
-    name.font = [UIFont boldSystemFontOfSize:22 weight:0];
+    name.font = [UIFont boldSystemFontOfSize:22];
     name.textColor = [UIColor labelColor];
     [header addSubview:name];
 

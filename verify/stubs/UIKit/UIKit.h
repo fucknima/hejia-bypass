@@ -127,6 +127,7 @@ enum { UIControlEventTouchUpInside = 64, UIControlEventValueChanged = 4096,
 + (UIFont *)monospacedSystemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
 
 + (UIFont *)systemFontOfSize:(CGFloat)sz;
++ (UIFont *)boldSystemFontOfSize:(CGFloat)sz;
 + (UIFont *)systemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
 + (UIFont *)boldSystemFontOfSize:(CGFloat)sz weight:(CGFloat)w;
 @end

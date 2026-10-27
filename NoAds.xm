@@ -77,7 +77,7 @@ static const char *kNeverBlock[] = {
     NULL
 };
 
-__attribute__((unused)) static BOOL na_isAdURL(NSString *url) {
+__attribute__((unused)) __attribute__((unused)) static BOOL na_isAdURL(NSString *url) {
     if (![url isKindOfClass:[NSString class]]) return NO;
     const char *s = url.UTF8String;
     if (!s) return NO;
@@ -159,7 +159,7 @@ static BOOL na_isAppClass(Class c) {
 // --- NSURLSession dataTaskWithRequest:completionHandler: ---
 static IMP na_orig_dataTask = NULL;
 
-__attribute__((unused)) static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handler) {
+__attribute__((unused)) __attribute__((unused)) static id na_dataTaskWithRequest(id self, SEL _cmd, NSURLRequest *req, id handler) {
     void (^h)(NSData *, NSURLResponse *, NSError *) = handler;
     if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
         NSString *u = [req.URL absoluteString];
@@ -322,7 +322,7 @@ static void na_patchAdDataGetters(void) {
 // ---------------------------------------------------------------------------
 static IMP na_orig_dataTaskReq = NULL;
 
-__attribute__((unused)) static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
+__attribute__((unused)) __attribute__((unused)) static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
     if (req && na_isEnabled()) {
         NSString *u = [req.URL absoluteString];
         if (na_isAdURL(u)) {
@@ -347,7 +347,7 @@ __attribute__((unused)) static id na_dataTaskWithRequestOnly(id self, SEL _cmd, 
 // ---------------------------------------------------------------------------
 static IMP na_orig_cachedResponse = NULL;
 
-static NSCachedURLResponse *na_cachedResponse(id self, SEL _cmd, NSURLRequest *req) {
+__attribute__((unused)) static NSCachedURLResponse *na_cachedResponse(id self, SEL _cmd, NSURLRequest *req) {
     if (req && na_isEnabled() && na_isAdURL([req.URL absoluteString])) {
         NA_SCAN("[CACHE-BLOCKED] %s\n", ([[req.URL absoluteString] UTF8String] ?: "?"));
         return nil;
