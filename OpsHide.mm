@@ -1,5 +1,5 @@
 // ============================================================================
-//  OpsHide.mm —— 运营位/推广卡片开关（默认关闭）
+//  OpsHide.mm —— 运营位/推广卡片开关（默认开启，兜底用）
 // ----------------------------------------------------------------------------
 //  只做「隐藏」，不改任何布局、不碰 tab bar、不 hook 任何 UIKit 方法。
 //  依据实测日志：首页那张「移动爱家产品功能 操作使用图册」是
@@ -72,7 +72,7 @@ static void HTHideOpsOnce(void) {
 __attribute__((constructor))
 static void HTOpsInit(void) {
     @autoreleasepool {
-        OPS_LOG(@"════ OpsHide 加载（默认关闭）════");
+        OPS_LOG(@"════ OpsHide 加载（默认开启）════");
 
         [[NSNotificationCenter defaultCenter]
             addObserverForName:@"HeJiaTool_NoAdsChanged" object:nil

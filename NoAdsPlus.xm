@@ -108,13 +108,25 @@ static void np_patch_mcs_popups(void) {
 //     明确带广告/推荐字样的模型 —— 匹配不到就不动，绝不误删设备。
 // ---------------------------------------------------------------------------
 static BOOL np_initedClsLog = NO;
+// 实测（HeJiaTool_10.log）：
+//   真设备  type=591630 / 2320794   desc=中兴云电脑… / 智能摄像头-1   rid=CMCC-…
+//   广告位  type=77777777 ×3        desc=(null)                    rid=(null)
+// 所以广告位的判据就是 type == 77777777（占位模型），不再靠类名猜。
+#define kNPAdPlaceholderType 77777777LL
+
 static BOOL np_isAdModel(id m) {
-    NSString *cn = NSStringFromClass([m class]);
-    if (![cn isKindOfClass:[NSString class]]) return NO;
-    return [cn containsString:@"Banner"] || [cn containsString:@"GDRB"] ||
-           [cn containsString:@"Recommend"] || [cn containsString:@"Promotion"] ||
-           [cn containsString:@"Advert"] || [cn containsString:@"AdCard"] ||
-           [cn containsString:@"AdModel"] || [cn containsString:@"Operation"];
+    @try {
+        id t = [m valueForKey:@"type"];
+        if (t && [t respondsToSelector:@selector(longLongValue)]) {
+            if ([t longLongValue] == kNPAdPlaceholderType) {
+                // 再确认一次：广告位的 desc 一定为空
+                id d = [m valueForKey:@"desc"];
+                if (!d || d == [NSNull null]) return YES;
+                if ([d isKindOfClass:[NSString class]] && [(NSString *)d length] == 0) return YES;
+            }
+        }
+    } @catch (NSException *e) { (void)e; }
+    return NO;
 }
 
 static IMP np_orig_cfgDevices = NULL;

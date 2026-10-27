@@ -80,9 +80,13 @@ void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
 @end
 @interface NSException : NSObject
 @property (nonatomic, readonly) NSString *reason; @end
+@interface NSNull : NSObject
++ (NSNull *)null;
+@end
 @interface NSNumber : NSObject
 + (NSNumber *)numberWithBool:(BOOL)b;
 - (NSInteger)integerValue;
+- (long long)longLongValue;
 - (int)intValue;
 - (BOOL)boolValue;
 - (long)longValue;
