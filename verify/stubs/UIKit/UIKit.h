@@ -203,6 +203,7 @@ enum {
 @interface UILongPressGestureRecognizer : UIGestureRecognizer
 @property (nonatomic) NSInteger numberOfTouchesRequired;
 @property (nonatomic) double minimumPressDuration;
+@property (nonatomic) double allowableMovement;
 @end
 
 #ifdef __cplusplus

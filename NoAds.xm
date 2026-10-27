@@ -221,27 +221,27 @@ static void na_patchAdSDKClasses(void) {
 
                 BOOL retVoid = (types[0] == 'v');
                 BOOL retObj  = (types[0] == '@');
-                BOOL retBool = (types[0] == 'B');
+                BOOL retBool __attribute__((unused)) = (types[0] == 'B');
 
-                // 初始化类：让它「成功」
+                // ⚠️ 不碰初始化/注册/加载：
+                //    屏蔽它们会让 SDK 内部状态不一致 → App 崩溃
                 if (strstr(sn, "init") || strstr(sn, "start") ||
-                    strstr(sn, "register") || strstr(sn, "setup")) {
-                    if (retVoid) { method_setImplementation(ms[j], na_voidFor(na_argc(sn))); patched++; }
-                    else if (retBool) { method_setImplementation(ms[j], (IMP)na_NO0); patched++; }
+                    strstr(sn, "register") || strstr(sn, "setup") ||
+                    strstr(sn, "load") || strstr(sn, "Load") ||
+                    strstr(sn, "request") || strstr(sn, "Request") ||
+                    strstr(sn, "fetch") || strstr(sn, "Fetch")) {
                     continue;
                 }
 
-                // 加载/展示类：全部短路
-                BOOL isBlock = (strstr(sn, "load") || strstr(sn, "Load") ||
-                                strstr(sn, "show") || strstr(sn, "Show") ||
-                                strstr(sn, "render") || strstr(sn, "Render") ||
-                                strstr(sn, "present") || strstr(sn, "request") ||
-                                strstr(sn, "Request") || strstr(sn, "fetch"));
-                if (!isBlock) continue;
+                // 只屏蔽「展示」这一最安全子集
+                BOOL isShow = (strstr(sn, "show") || strstr(sn, "Show") ||
+                               strstr(sn, "render") || strstr(sn, "Render") ||
+                               strstr(sn, "present") || strstr(sn, "Present"));
+                if (!isShow) continue;
+                if (!retVoid && !retObj) continue;
 
                 if (retVoid)      { method_setImplementation(ms[j], na_voidFor(na_argc(sn))); patched++; }
                 else if (retObj)  { method_setImplementation(ms[j], na_nilFor(na_argc(sn))); patched++; }
-                else if (retBool) { method_setImplementation(ms[j], (IMP)na_NO0); patched++; }
             }
             free(ms);
         }
@@ -294,6 +294,32 @@ static void na_patchAdDataGetters(void) {
 // ===========================================================================
 // 第 4 层：总开关 + isShowAd*
 // ===========================================================================
+// ---------------------------------------------------------------------------
+// 网络层 v2：AFNetworking 走 delegate 模式，completionHandler 版本抓不到，
+// 必须 hook 最底层的 -[NSURLSession dataTaskWithRequest:]
+// ---------------------------------------------------------------------------
+static IMP na_orig_dataTaskReq = NULL;
+
+static id na_dataTaskWithRequestOnly(id self, SEL _cmd, NSURLRequest *req) {
+    if (req && na_isEnabled()) {
+        NSString *u = [req.URL absoluteString];
+        if (na_isAdURL(u)) {
+            NA_LOG(@"拦截广告请求(task): %@", u);
+            NA_SCAN("[BLOCKED] %s\n", (u.UTF8String ?: "?"));
+            // 返回一个指向不可达地址的请求，让它必然失败且不产生流量
+            NSURL *dead = [NSURL URLWithString:@"about:blank"];
+            NSURLRequest *deadReq = [NSURLRequest requestWithURL:dead];
+            typedef id (*fn_t)(id, SEL, NSURLRequest *);
+            if (na_orig_dataTaskReq) {
+                return ((fn_t)na_orig_dataTaskReq)(self, _cmd, deadReq);
+            }
+            return nil;
+        }
+    }
+    typedef id (*fn_t)(id, SEL, NSURLRequest *);
+    return na_orig_dataTaskReq ? ((fn_t)na_orig_dataTaskReq)(self, _cmd, req) : nil;
+}
+
 static void na_patchSwitch(void) {
     Class c = objc_getClass("HYGetAdSwitchState");
     if (!c) { NA_LOG(@"未找到 HYGetAdSwitchState"); return; }
@@ -358,6 +384,14 @@ static void HeJiaNoAdsInit(void) {
                 na_orig_dataTask = method_getImplementation(m);
                 method_setImplementation(m, (IMP)na_dataTaskWithRequest);
                 NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:completionHandler:]");
+            }
+            // 关键：AFNetworking delegate 模式走这个
+            Method m2 = class_getInstanceMethod(NSURLSessionC,
+                          @selector(dataTaskWithRequest:));
+            if (m2) {
+                na_orig_dataTaskReq = method_getImplementation(m2);
+                method_setImplementation(m2, (IMP)na_dataTaskWithRequestOnly);
+                NA_LOG(@"hook -[NSURLSession dataTaskWithRequest:]  <-- AF 路径");
             }
         }
 

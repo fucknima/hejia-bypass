@@ -58,6 +58,15 @@ static UIViewController *HTTopMostViewController(void) {
 }
 
 // ---------------------------------------------------------------------------
+// 手势代理：允许与 App 现有手势同时识别（否则三指会被列表/地图等吃掉）
+// ---------------------------------------------------------------------------
+static BOOL HTGestureShouldRecognizeSimultaneously(id self, SEL _cmd,
+                                                   id g, id other) {
+    (void)self; (void)g; (void)other;
+    return YES;
+}
+
+// ---------------------------------------------------------------------------
 // 手势回调：弹出菜单
 // ---------------------------------------------------------------------------
 static void HTGestureFired(UILongPressGestureRecognizer *g) {
@@ -127,27 +136,37 @@ static void HTInstallGesture(UIWindow *window) {
     if (!window) return;
     if (objc_getAssociatedObject(window, kHTGestureKey)) return;
 
-    // 给 window 动态挂手势回调方法（只需一次）
+    // 给 window 动态挂回调 + 代理方法（只需一次）
     static BOOL methodAdded = NO;
     if (!methodAdded) {
-        class_addMethod(object_getClass(window),
-                        sel_registerName("HTGestureFired:"),
+        Class meta = object_getClass(window);
+        class_addMethod(meta, sel_registerName("HTGestureFired:"),
                         (IMP)HTGestureFired, "v24@0:8@16");
+        class_addMethod(meta,
+            sel_registerName("gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:"),
+            (IMP)HTGestureShouldRecognizeSimultaneously, "B32@0:8@16@24");
         methodAdded = YES;
     }
+
+    // 挂到 rootViewController.view 上更可靠（window 层会被系统手势截获）
+    UIViewController *root = window.rootViewController;
+    UIView *host = root.view ?: window;
+    if (!host) return;
 
     UILongPressGestureRecognizer *g = [[UILongPressGestureRecognizer alloc]
          initWithTarget:window action:sel_registerName("HTGestureFired:")];
     g.numberOfTouchesRequired = 3;
-    g.minimumPressDuration = 0.6;
+    g.minimumPressDuration = 0.5;
+    g.allowableMovement = 60.0;
     g.cancelsTouchesInView = NO;
     g.delaysTouchesBegan = NO;
     g.delaysTouchesEnded = NO;
+    g.delegate = (id)window;
 
-    [window addGestureRecognizer:g];
+    [host addGestureRecognizer:g];
     objc_setAssociatedObject(window, kHTGestureKey, g,
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    UI_LOG(@"已给 window 挂载三指长按手势");
+    UI_LOG(@"已挂载三指长按手势 (host=%@)", NSStringFromClass([host class]));
 }
 
 // ---------------------------------------------------------------------------

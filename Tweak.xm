@@ -85,6 +85,7 @@ static BOOL HMReturnNO(id self, SEL _cmd) { return NO; }
 // 一个 id 参数，返回 BOOL
 static BOOL HMReturnNO_arg1(id self, SEL _cmd, id a) { return NO; }
 // 三个 id 参数，返回 void
+__attribute__((unused))
 static void HMReturnVoid_arg3(id self, SEL _cmd, id a, id b, id c) { }
 
 // ---------------------------------------------------------------------------
@@ -173,19 +174,30 @@ static void HMHookBlackbees(void) {
 //    因此改为「运行期按方法名全量扫描」：遍历所有已加载类，
 //    谁实现了该选择器就 hook 谁，避免类名写错导致静默失效。
 // ---------------------------------------------------------------------------
-// 判断某个类是否属于主 App / 内嵌框架（非系统库）
+// 判断某个类是否属于【当前主 App 进程】的镜像
+// ⚠️ 注意：不能只排除 /System/Library，那样会把同进程内其他 App 的
+//    注入类也当成自己的（实测误伤了 NHEWebsocketSession 导致登录失败）
 static BOOL HMClassBelongsToApp(Class c) {
     Dl_info info;
-    if (!dladdr((__bridge const void *)c, &info) || !info.dli_fname) {
-        return NO;   // 拿不到镜像信息就跳过，宁缺勿滥
-    }
-    // 系统库直接跳过
+    if (!dladdr((__bridge const void *)c, &info) || !info.dli_fname) return NO;
+
+    // 系统库直接排除
     if (strstr(info.dli_fname, "/System/Library/") ||
         strstr(info.dli_fname, "/usr/lib/") ||
         strstr(info.dli_fname, "/Developer/")) {
         return NO;
     }
-    return YES;
+
+    // 必须位于本 App 的 .app 目录内
+    static char appPath[1024] = {0};
+    static BOOL pathReady = NO;
+    if (!pathReady) {
+        const char *bundle = [[[NSBundle mainBundle] bundlePath] UTF8String];
+        if (bundle) strncpy(appPath, bundle, sizeof(appPath) - 1);
+        pathReady = YES;
+    }
+    if (!appPath[0]) return NO;
+    return strstr(info.dli_fname, appPath) != NULL;
 }
 
 __attribute__((unused))
@@ -231,20 +243,15 @@ static int HMHookAllClassesImplementing(SEL sel, IMP newImp, const char *label) 
     return count;
 }
 
-// 主包业务层：防篡改回调 + andlink 环境检查（3 个 id 参数、返回 void）
+// 主包业务层：已移除
+// ⚠️ 曾经用「全类扫描」hook deviceAntiTamperAction:value:callbackHandle:，
+//    结果误伤到 NHEWebsocketSession（非本 App 的类），导致长连接失效、
+//    登录卡死。这两个方法不再 hook，风险远大于收益。
 static void HMHookMainAppExtra(void) {
     static BOOL done = NO;
     if (done) return;
     done = YES;
-
-    int n1 = HMHookAllClassesImplementing(
-        @selector(deviceAntiTamperAction:value:callbackHandle:),
-        (IMP)HMReturnVoid_arg3, "deviceAntiTamper");
-    int n2 = HMHookAllClassesImplementing(
-        @selector(andlinkCheckEnvironmentWithType:result:failure:),
-        (IMP)HMReturnVoid_arg3, "andlinkEnvironment");
-
-    HM_LOG(@"主包扫描：deviceAntiTamper 命中 %d 个类，andlinkCheckEnv 命中 %d 个类", n1, n2);
+    HM_LOG(@"主包业务层 hook 已停用（避免误伤）");
 }
 
 // ---------------------------------------------------------------------------
