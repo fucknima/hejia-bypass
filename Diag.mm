@@ -42,6 +42,41 @@ static id HTDiagHitTest(id self, SEL _cmd, CGPoint point, id event) {
     return hit;
 }
 
+// ---------------------------------------------------------------------------
+// 一次性 dump：窗口列表 + 视图树（类名/坐标/隐藏/可交互）
+// ---------------------------------------------------------------------------
+static void HTDumpTree(UIView *v, int depth, int *budget) {
+    if (!v || depth > 6 || *budget <= 0) return;
+    (*budget)--;
+    CGRect f = v.frame;
+    NSString *pad = @"";
+    for (int i = 0; i < depth; i++) pad = [pad stringByAppendingString:@"  "];
+    D_LOG(@"%@%@ f=(%.0f,%.0f,%.0f,%.0f) h=%d a=%.2f i=%d",
+          pad,
+          NSStringFromClass([v class]),
+          f.origin.x, f.origin.y, f.size.width, f.size.height,
+          (int)v.hidden, (double)v.alpha, (int)v.isUserInteractionEnabled);
+    for (UIView *s in v.subviews) HTDumpTree(s, depth + 1, budget);
+}
+
+static void HTDumpHierarchy(void) {
+    NSArray *wins = [UIApplication sharedApplication].windows;
+    D_LOG(@"==== windows=%lu ====", (unsigned long)wins.count);
+    int budget = 260;
+    for (UIWindow *w in wins) {
+        CGRect f = w.frame;
+        D_LOG(@"WIN %@ f=(%.0f,%.0f,%.0f,%.0f) h=%d level=%.0f root=%@",
+              NSStringFromClass([w class]),
+              f.origin.x, f.origin.y, f.size.width, f.size.height,
+              (int)w.hidden, (double)w.windowLevel,
+              NSStringFromClass([w.rootViewController class]));
+    }
+    D_LOG(@"==== keyWindow tree ====");
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
+    if (win) HTDumpTree(win, 0, &budget);
+    D_LOG(@"==== tree end (budget=%d) ====", budget);
+}
+
 static void HTDiagHeartbeat(void) {
     static int n = 0;
     if (n >= 25) return;
@@ -70,6 +105,11 @@ static void HTDiagInit(void) {
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
                        dispatch_get_main_queue(), ^{ HTDiagHeartbeat(); });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(7 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            @try { HTDumpHierarchy(); } @catch (NSException *e) { (void)e; }
+        });
     }
 }
 

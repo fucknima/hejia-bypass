@@ -76,6 +76,9 @@ enum { UIImageRenderingModeAlwaysOriginal = 1, UIImageRenderingModeAlwaysTemplat
 @property (nonatomic, readonly) id window;
 @property (nonatomic) BOOL hidden;
 @property (nonatomic, strong) UIColor *backgroundColor;
+@property (nonatomic) CGFloat alpha;
+@property (nonatomic) BOOL userInteractionEnabled;
+@property (nonatomic, readonly) BOOL isUserInteractionEnabled;
 - (void)addSubview:(UIView *)v;
 - (void)removeFromSuperview;
 - (void)layoutSubviews;
@@ -210,6 +213,7 @@ enum { UIAlertControllerStyleActionSheet = 0, UIAlertControllerStyleAlert = 1 };
 @end
 @interface UIWindow : UIView
 @property (nonatomic, readonly, getter=isKeyWindow) BOOL keyWindow;
+@property (nonatomic) CGFloat windowLevel;
 @property (nonatomic, strong) UIViewController *rootViewController;
 @end
 
